@@ -476,12 +476,12 @@ function drawLearning(){
  const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
  for(let i=0;i<terms.length;i++){if(i){const plus=document.createElement('span');plus.textContent='+';equation.append(plus)}const n=document.createElement('span');n.textContent=terms[i];equation.append(n)}
  const equals=document.createElement('span');equals.textContent='=';equation.append(equals);
- const result=document.createElement('span');result.textContent=done||learnIndex>0&&false?'':String(s.sum);equation.append(result);
+ const result=document.createElement('span');result.textContent='?';equation.append(result);
  if(!done){box.append(equation);const tip=document.createElement('div');tip.textContent='Ile to jest? Pomyśl, a potem wybierz „Pokaż krok”.';box.append(tip)}
  else {const tip=document.createElement('div');tip.textContent='Teraz rozwiąż podobne działanie po prawej stronie.';box.append(tip)}
  if(learnIndex>0&&!done){
   const previous=learnSteps[learnIndex-1],tip=document.createElement('div');
-  tip.textContent='Poprzedni krok: zapisaliśmy '+previous.result+(previous.next?', przenieśliśmy '+previous.next+' dalej.':'.');
+  tip.textContent='Poprzedni krok: '+previous.sum+' → zapisaliśmy '+previous.result+(previous.next?', przenieśliśmy '+previous.next+' dalej.':'.');
   box.append(tip);
  }
  $('learn-prev').disabled=learnIndex===0;
