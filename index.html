@@ -29,8 +29,8 @@ body.dark .score{color:var(--muted)}
 body.dark .rule{border-color:var(--ink)}
 @media(max-width:460px){body{padding:5px}main{border-radius:12px;padding:12px;min-height:calc(100dvh - 10px)}.menu{min-height:calc(100dvh - 55px)}.workspace{margin-top:28px}.game-head{align-items:flex-start}}
 .test-review-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.test-review-item h3{margin:0 0 8px;font-size:16px}.test-review-item .math{--cell:clamp(25px,6vw,39px)}#test-review{max-height:65vh;overflow:auto}.carry .cell{font-size:20px}.menu .option select{width:100%}@media(max-width:600px){.math{--cell:clamp(24px,6vw,40px)}.workspace{gap:15px}} </style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.0</div></section>
-<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.1</div></section>
+<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option></select></div><div class="option" id="sandbox-settings" hidden><label for="sandbox-count">Liczba składników</label><select id="sandbox-count"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6" selected>6</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
 <div id="test-heading" hidden><strong id="test-step"></strong></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
@@ -41,6 +41,7 @@ body.dark .rule{border-color:var(--ink)}
 'use strict';
 const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
+let sandboxCount=6,sandboxErrors=new Set();
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
 const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
@@ -141,19 +142,30 @@ function setupPuzzle(){
   for(const k of candidates.slice(0,count)){
    const expected=Number(display[k]);values[k]=String((expected+1+Math.floor(Math.random()*8))%10);editable.add(k);
   }
-  // Pozostałe cyfry są poprawne i nie wymagają przepisywania.
+  // Uczeń może edytować wszystkie cyfry wyniku.
+  for(const s of slots.filter(s=>s.kind==='result')){const k=key(s.kind,s.pos);editable.add(k);if(!(k in values))values[k]=display[k]}
  }else{
   for(const s of slots){const k=key(s.kind,s.pos);editable.add(k);values[k]=''}
  }
+ if(['missing','gaps','repair'].includes(mode))for(const s of slots.filter(s=>s.kind==='carry')){const k=key(s.kind,s.pos);editable.add(k);values[k]=''}
  active=[...editable][0]||'';phase='editing';attempted=false;
  $('solution').classList.remove('visible');$('status').textContent='';$('test-review').hidden=true;render();progress();
 }
 function setup(ns){
+ if(mode==='sandbox'){setupSandbox();return}
  numbers=ns||generate();buildSlots();setupPuzzle();
+}
+function setupSandbox(){
+ sandboxCount=Number($('sandbox-count').value);width=8;numbers=Array(sandboxCount).fill(0);slots=[];display={};values={};editable=new Set();sandboxErrors=new Set();
+ for(let r=0;r<sandboxCount;r++)for(let p=0;p<7;p++){const k=key('n'+r,p);editable.add(k);values[k]=''}
+ for(let p=0;p<8;p++){const k=key('result',p);editable.add(k);values[k]=''}
+ for(let p=1;p<8;p++){const k=key('carry',p);editable.add(k);values[k]=''}
+ active=key('n0',0);phase='editing';attempted=false;$('solution').classList.remove('visible');$('status').textContent='Wpisz składniki i wynik. Puste kratki po lewej stronie mogą pozostać niewypełnione.';render();progress();
 }
 function cell(content,cls=''){const d=document.createElement('div');d.className='cell '+cls;d.textContent=content??'';return d}
 function line(parent,arr,cls=''){const d=document.createElement('div');d.className='line '+cls;d.append(cell('','sign'));arr.forEach(c=>d.append(c));parent.append(d)}
 function draw(target,correct=false,container){
+ if(mode==='sandbox'){drawSandbox(target,correct,container);return}
  const root=container||$(target);root.replaceChildren();
  const get=(kind,pos,expected)=>{
   const k=key(kind,pos),canEdit=editable.has(k),value=correct?expected:(canEdit?values[k]??'':display[k]??expected);
@@ -166,9 +178,9 @@ function draw(target,correct=false,container){
   }
   return d;
  };
- if(mode!=='missing'&&mode!=='gaps'&&mode!=='repair'&&width>1){
+ if(width>1){
   line(root,Array.from({length:width},(_,i)=>{const p=width-1-i,s=slots.find(x=>x.kind==='carry'&&x.pos===p);return s?get('carry',p,s.expected):cell('')}),'carry');
- }else if(width>1)line(root,Array.from({length:width},(_,i)=>{const p=width-1-i;return cell('')}),'carry');
+ }
  numbers.forEach((n,r)=>{
   const row=document.createElement('div');row.className='line';row.append(cell(r===numbers.length-1?'+':'','sign'));
   for(let p=width-1;p>=0;p--)row.append(p>=String(n).length?cell(''):get('n'+r,p,String(digit(n,p))));
@@ -177,6 +189,52 @@ function draw(target,correct=false,container){
  const rule=document.createElement('div');rule.className='rule';root.append(rule);
  line(root,Array.from({length:width},(_,i)=>{const p=width-1-i;return get('result',p,String(digit(total(),p)))}));
 }
+
+function drawSandbox(target,correct=false,container){
+ const root=container||$(target);root.replaceChildren();
+ const entry=(kind,p)=>{
+  const k=key(kind,p),value=values[k]||'',locked=phase!=='editing';
+  const d=cell(value,'entry'+(active===k&&!locked?' active':'')+(sandboxErrors.has(k)?' wrong':''));
+  if(!locked){d.setAttribute('role','button');d.tabIndex=0;d.onclick=()=>{active=k;render()};d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}}}
+  return d;
+ };
+ line(root,Array.from({length:8},(_,i)=>{const p=7-i;return p===0?cell(''):entry('carry',p)}),'carry');
+ for(let r=0;r<sandboxCount;r++){
+  const row=document.createElement('div');row.className='line';row.append(cell(r===sandboxCount-1?'+':'','sign'));
+  for(let p=7;p>=0;p--)row.append(p===7?cell(''):entry('n'+r,p));
+  root.append(row);
+ }
+ const rule=document.createElement('div');rule.className='rule';root.append(rule);
+ line(root,Array.from({length:8},(_,i)=>entry('result',7-i)));
+}
+function checkSandbox(){
+ sandboxErrors=new Set();const ns=[];
+ for(let r=0;r<sandboxCount;r++){
+  const chars=Array.from({length:7},(_,i)=>values[key('n'+r,6-i)]||'');
+  const str=chars.join(''),trimmed=str.replace(/^ */,'');
+  if(!trimmed){for(let p=0;p<7;p++)sandboxErrors.add(key('n'+r,p));continue}
+  // Dopuszczamy puste kratki wyłącznie przed pierwszą cyfrą.
+  if(/\s/.test(trimmed)){for(let p=0;p<7;p++)if(!values[key('n'+r,p)])sandboxErrors.add(key('n'+r,p))}
+  ns.push(Number(trimmed.replace(/ /g,'')));
+ }
+ if(ns.length!==sandboxCount||sandboxErrors.size){
+  $('status').textContent='Wpisz każdy składnik bez pustych kratek pomiędzy cyframi.';render();return;
+ }
+ const sum=ns.reduce((a,b)=>a+b,0),answer=String(sum);
+ const result=Array.from({length:8},(_,i)=>values[key('result',7-i)]||'').join('');
+ if(result.replace(/^ */,'')!==answer){
+  for(let p=0;p<8;p++)if((values[key('result',p)]||'')!==(p<answer.length?String(digit(sum,p)):''))sandboxErrors.add(key('result',p));
+ }
+ let carry=0;
+ for(let p=0;p<8;p++){
+  const next=Math.floor((ns.reduce((a,n)=>a+digit(n,p),carry))/10);
+  if(p<7&&values[key('carry',p+1)]!==(next?String(next):''))sandboxErrors.add(key('carry',p+1));
+  carry=next;
+ }
+ $('status').textContent=sandboxErrors.size?'Sprawdź zaznaczone na czerwono kratki.':'Brawo! Wszystkie składniki, przeniesienia i wynik są poprawne.';
+ render();
+}
+
 function allGood(){return [...editable].every(k=>values[k]===display[k])}
 function progress(){
  $('series-label').textContent='Seria '+series;
@@ -184,20 +242,21 @@ function progress(){
  const root=$('progress');root.replaceChildren();
  for(let i=0;i<10;i++){const c=document.createElement('span');if(i<results.length){c.className=results[i]?'ok':'bad';c.textContent=results[i]?'✓':'×'}root.append(c)}
  $('test-heading').hidden=mode!=='test';$('test-step').textContent='Kartkówka — zadanie '+(taskIndex+1)+' z 5';
- document.querySelector('.progress-head').hidden=mode==='test';$('progress').hidden=mode==='test';
+ document.querySelector('.progress-head').hidden=mode==='test'||mode==='sandbox';$('progress').hidden=mode==='test'||mode==='sandbox';
 }
 function render(){
  draw('exercise');$('delete').disabled=phase!=='editing';
  $('check').hidden=phase!=='editing'||mode==='test';
- $('correct').hidden=phase!=='review'||allGood()||mode==='test';
- $('new').textContent=mode==='test'?'Następne zadanie':attempted?'Następne zadanie':'Nowe zadanie';
+ $('correct').hidden=mode==='sandbox'||phase!=='review'||allGood()||mode==='test';
+ $('new').textContent=mode==='sandbox'?'Wyczyść kratki':mode==='test'?'Następne zadanie':attempted?'Następne zadanie':'Nowe zadanie';
  $('new').hidden=mode==='test'&&taskIndex===4;
  $('submit-test').hidden=mode!=='test'||taskIndex!==4||phase==='done';
 }
-function enter(n){if(phase!=='editing'||!active)return;values[active]=String(n);render()}
-function remove(){if(phase!=='editing'||!active)return;values[active]='';render()}
+function enter(n){if(phase!=='editing'||!active)return;values[active]=String(n);sandboxErrors.delete(active);render()}
+function remove(){if(phase!=='editing'||!active)return;values[active]='';sandboxErrors.delete(active);render()}
 function check(){
  if(phase!=='editing'||mode==='test')return;
+ if(mode==='sandbox'){checkSandbox();return}
  const good=allGood(),num=[...editable].filter(k=>values[k]===display[k]).length;
  if(!attempted){
   results.push(good);attempted=true;
@@ -211,6 +270,7 @@ function check(){
 function correct(){if(phase!=='review')return;phase='editing';$('solution').classList.remove('visible');$('status').textContent='Popraw działanie i sprawdź ponownie.';render()}
 function snapshot(){return {numbers:numbers.slice(),values:{...values},editable:[...editable],display:{...display},level,taskIndex}}
 function next(){
+ if(mode==='sandbox'){setupSandbox();return}
  if(mode==='test'){
   if(taskIndex>=4)return;
   testItems.push(snapshot());taskIndex++;level=taskIndex+1;setup(generate(level,7,'test'));return;
@@ -240,7 +300,7 @@ function show(id){for(const el of document.querySelectorAll('.screen'))el.hidden
 function startGame(){
  mode=$('mode').value;level=mode==='test'?1:Number($('level').value);
  series=1;results=[];taskIndex=0;testItems=[];testReview=false;
- $('game-level').textContent=mode==='test'?'Kartkówka':$('level').selectedOptions[0].textContent+' · '+$('mode').selectedOptions[0].textContent;
+ $('game-level').textContent=mode==='sandbox'?'Piaskownica':mode==='test'?'Kartkówka':$('level').selectedOptions[0].textContent+' · '+$('mode').selectedOptions[0].textContent;
  setup(mode==='test'?generate(1,7,'test'):undefined);show('game');
 }
 function openOptions(from){optionsFrom=from;if(from==='game')$('pause-dialog').hidden=true;show('options')}
@@ -255,6 +315,7 @@ $('delete').onclick=remove;$('check').onclick=check;$('correct').onclick=correct
 try{const saved=JSON.parse(localStorage.getItem('written-addition-options')||'{}');if(['small','normal','large'].includes(saved.size))$('font-size').value=saved.size;if(['light','dark'].includes(saved.theme))$('theme').value=saved.theme}catch(e){}
 $('home-new').onclick=()=>show('choose');$('home-options').onclick=()=>openOptions('home');
 $('choose-back').onclick=()=>show('home');$('start').onclick=startGame;
+$('mode').onchange=()=>{$('sandbox-settings').hidden=$('mode').value!=='sandbox';document.querySelector('label[for="level"]').parentElement.hidden=$('mode').value==='sandbox'};
 $('pause').onclick=()=>{$('pause-dialog').hidden=false};$('resume').onclick=()=>{$('pause-dialog').hidden=true};
 $('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){startGame();$('pause-dialog').hidden=true}};
 $('go-home').onclick=()=>{$('pause-dialog').hidden=true;show('home')};
