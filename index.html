@@ -1,49 +1,88 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Działania pisemne – Pan Ignacy</title>
 <style>
-:root{font-family:Arial,sans-serif;color:#182234;background:white}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:18px 12px}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}label{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:14px}button,select{font:inherit;border:1px solid #c7d0df;border-radius:9px;padding:11px 15px;background:#f5f7fb;color:#17243a;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #93c5fd}.primary{background:#2563eb;color:white;border-color:#2563eb}.workspace{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}.panel{min-width:0;max-width:100%}.math{--cell:clamp(29px,7vw,48px);overflow-x:auto;max-width:100%;padding:10px 4px 14px}.column{width:max-content;margin:auto}.line{display:flex;align-items:center;height:var(--cell)}.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,5vw,30px);font-weight:600;font-variant-numeric:tabular-nums}.sign{width:var(--cell);font-size:28px}.entry{background:#263244;color:white;border:2px solid white;border-radius:6px;cursor:pointer;padding:0}.entry.active{background:#2563eb;border-color:#93c5fd;box-shadow:0 0 0 2px #93c5fd}.entry.wrong{background:#b91c1c}.entry.right{background:#166534}.carry .entry{height:calc(var(--cell)*.72);font-size:20px}.carry{height:calc(var(--cell)*.8)}.rule{border-top:3px solid #182234;margin:4px 0}.keypad{display:grid;grid-template-columns:repeat(5,minmax(45px,70px));gap:9px;margin:16px 0}.keypad button{font-size:23px;font-weight:bold;min-height:58px}.status{min-height:26px;font-weight:600}.solution{display:none}.solution.visible{display:block}.solution-title{font-size:16px;font-weight:600;margin:8px 0}.score{color:#526074;font-size:14px} @media(max-width:460px){main{padding:12px 8px}.workspace{gap:16px}.keypad{grid-template-columns:repeat(5,1fr)}.keypad button{padding:10px 0}}
+:root{font-family:Arial,sans-serif;color:#182234;background:white}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:18px 12px}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}label{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:14px}button,select{font:inherit;border:1px solid #c7d0df;border-radius:9px;padding:11px 15px;background:#f5f7fb;color:#17243a;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #93c5fd}.primary{background:#2563eb;color:white;border-color:#2563eb}.workspace{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}.panel{min-width:0;max-width:100%}.math{--cell:clamp(29px,7vw,48px);overflow-x:auto;max-width:100%;padding:10px 4px 14px}.column{width:max-content;margin:auto}.line{display:flex;align-items:center;height:var(--cell)}.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,5vw,30px);font-weight:600;font-variant-numeric:tabular-nums}.sign{width:var(--cell);font-size:28px}.entry{background:#263244;color:white;border:2px solid white;border-radius:6px;cursor:pointer;padding:0}.entry.active{background:#2563eb;border-color:#93c5fd;box-shadow:0 0 0 2px #93c5fd}.entry.wrong{background:#b91c1c}.entry.right{background:#166534}.carry .entry{height:calc(var(--cell)*.72);font-size:20px}.carry{height:calc(var(--cell)*.8)}.rule{border-top:3px solid #182234;margin:4px 0}.keypad{display:grid;grid-template-columns:repeat(5,minmax(45px,70px));gap:9px;margin:16px 0}.keypad button{font-size:23px;font-weight:bold;min-height:58px}.status{min-height:26px;font-weight:600}.solution{display:none}.solution.visible{display:block}.solution-title{font-size:16px;font-weight:600;margin:8px 0}.score{color:#526074;font-size:14px}.progress-head{display:flex;justify-content:space-between;max-width:390px;font-size:14px;margin:12px 0 5px}.progress{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));max-width:390px;border:1px solid #b9c3d2;border-radius:5px;overflow:hidden}.progress span{height:35px;display:grid;place-items:center;background:#f1f5f9;border-right:1px solid #b9c3d2;font-weight:bold;font-size:22px}.progress span:last-child{border:0}.progress .ok{background:#16a34a;color:white}.progress .bad{background:#dc2626;color:white} @media(max-width:460px){main{padding:12px 8px}.workspace{gap:16px}.keypad{grid-template-columns:repeat(5,1fr)}.keypad button{padding:10px 0}}
 </style></head><body><main>
-<div class="toolbar"><label>Pierwszy składnik <select id="length1"></select></label><label>Drugi składnik <select id="length2"></select></label><button id="new">Nowe zadanie</button></div>
-<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button></div><div id="status" class="status" aria-live="polite"></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div>
+<div class="toolbar"><label>Poziom <select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></label><button id="new">Nowe zadanie</button></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
+<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button></div><div id="status" class="status" aria-live="polite"></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div>
 </main><script>
 'use strict';
 const $=id=>document.getElementById(id);
-let numbers=[],width=0,slots=[],values={},active='',finished=false;
+const ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
+let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false;
+let level=3,series=1,results=[],taskIndex=0;
 const digit=(n,pos)=>Math.floor(n/10**pos)%10;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
 const key=(kind,pos)=>kind+':'+pos;
-for(const id of ['length1','length2']){for(let n=1;n<=7;n++){const o=document.createElement('option');o.value=n;o.textContent=n+' '+(n===1?'cyfra':n<5?'cyfry':'cyfr');$(id).append(o)}$(id).value='4'}
+function difficulty(a,b){
+ const width=Math.max(String(a).length,String(b).length);
+ let carry=0,count=0,chain=0,maxChain=0,zeros=0;
+ for(let p=0;p<width;p++){
+  const da=digit(a,p),db=digit(b,p),next=da+db+carry>=10?1:0;
+  if(next){count++;chain++;maxChain=Math.max(chain,maxChain)}else chain=0;
+  if((da===0||db===0)&&p<Math.min(String(a).length,String(b).length))zeros++;
+  carry=next;
+ }
+ return {count,maxChain,zeros};
+}
+function chooseLength(){
+ const [lo,hi]=ranges[level-1],t=taskIndex%10;
+ return t<3?lo:t>=7?hi:(Math.random()<.5?lo:hi);
+}
+function acceptable(a,b){
+ const d=difficulty(a,b),w=Math.max(String(a).length,String(b).length);
+ if(level===1)return d.count<=1;
+ if(level===2)return d.count>=1&&d.count<=Math.min(2,w);
+ if(level===3)return d.count>=Math.min(2,w)&&d.count<=Math.min(4,w);
+ if(level===4)return d.count>=Math.min(3,w)&&d.maxChain>=2;
+ return d.count>=Math.min(4,w)&&d.maxChain>=3;
+}
+function generate(){
+ const len=chooseLength();let best=null;
+ for(let i=0;i<4000;i++){
+  const a=randomNumber(len),b=randomNumber(len),d=difficulty(a,b);
+  if(acceptable(a,b))return [a,b];
+  if(!best||d.count>best.d.count)best={a,b,d};
+ }
+ return [best.a,best.b];
+}
+function progress(){
+ $('series-label').textContent='Seria '+series;
+ $('counter').textContent=results.filter(x=>x).length+'/'+results.length;
+ const root=$('progress');root.replaceChildren();
+ for(let i=0;i<10;i++){
+  const c=document.createElement('span');
+  if(i<results.length){c.className=results[i]?'ok':'bad';c.textContent=results[i]?'✓':'×'}
+  root.append(c);
+ }
+}
 function setup(){
- numbers=[randomNumber(Number($('length1').value)),randomNumber(Number($('length2').value))];
- const total=numbers.reduce((a,b)=>a+b,0);
- width=String(total).length;
+ numbers=generate();const total=numbers[0]+numbers[1];width=String(total).length;
  slots=[];let carry=0;
  for(let pos=0;pos<width;pos++){
-  const sum=numbers.reduce((a,n)=>a+digit(n,pos),carry);
-  slots.push({kind:'result',pos,expected:pos<String(total).length?String(digit(total,pos)):''});
+  const sum=digit(numbers[0],pos)+digit(numbers[1],pos)+carry;
+  slots.push({kind:'result',pos,expected:String(digit(total,pos))});
   const next=Math.floor(sum/10);
   if(pos<width-1)slots.push({kind:'carry',pos:pos+1,expected:next?String(next):''});
   carry=next;
  }
  values={};for(const s of slots)values[key(s.kind,s.pos)]='';
- active=key('result',0);finished=false;
- $('solution').classList.remove('visible');$('status').textContent='';render();
+ active=key('result',0);phase='editing';attempted=false;
+ $('solution').classList.remove('visible');$('status').textContent='';render();progress();
 }
 function cell(content,cls=''){const d=document.createElement('div');d.className='cell '+cls;d.textContent=content??'';return d}
 function line(parent,arr,cls=''){const d=document.createElement('div');d.className='line '+cls;d.append(cell('','sign'));arr.forEach(c=>d.append(c));parent.append(d)}
 function makeEntry(kind,pos,correct){
  const k=key(kind,pos),slot=slots.find(s=>key(s.kind,s.pos)===k);
  const expected=slot?.expected??'',value=correct?expected:values[k]??'';
- const d=cell(value,'entry'+(!correct&&active===k&&!finished?' active':'')+(!correct&&finished?(values[k]===expected?' right':' wrong'):''));
- if(!correct&&!finished){d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label',(kind==='carry'?'Przeniesienie':'Wynik')+' kolumna '+(pos+1));d.addEventListener('click',()=>{active=k;render()});d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}})}
+ const locked=phase!=='editing';
+ const d=cell(value,'entry'+(!correct&&active===k&&!locked?' active':'')+(!correct&&locked?(values[k]===expected?' right':' wrong'):''));
+ if(!correct&&!locked){d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label',(kind==='carry'?'Przeniesienie':'Wynik')+' kolumna '+(pos+1));d.addEventListener('click',()=>{active=k;render()});d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}})}
  return d;
 }
 function draw(target,correct){
  const root=$(target);root.replaceChildren();
- if(width>1){
-  const carryCells=Array.from({length:width},(_,i)=>{const pos=width-1-i;return pos===0?cell(''):makeEntry('carry',pos,correct)});
-  line(root,carryCells,'carry');
- }
+ if(width>1)line(root,Array.from({length:width},(_,i)=>{const pos=width-1-i;return pos===0?cell(''):makeEntry('carry',pos,correct)}),'carry');
  numbers.forEach((n,index)=>{
   const chars=String(n).padStart(width,' ').split('');
   const row=document.createElement('div');row.className='line';row.append(cell(index===numbers.length-1?'+':'','sign'));
@@ -52,20 +91,39 @@ function draw(target,correct){
  const rule=document.createElement('div');rule.className='rule';root.append(rule);
  line(root,Array.from({length:width},(_,i)=>makeEntry('result',width-1-i,correct)));
 }
-function render(){draw('exercise',false);$('delete').disabled=finished;$('check').disabled=finished}
-function enter(n){if(finished)return;values[active]=String(n);render()}
-function remove(){if(finished)return;values[active]='';render()}
+function render(){
+ draw('exercise',false);
+ $('delete').disabled=phase!=='editing';
+ $('check').hidden=phase!=='editing';
+ $('correct').hidden=phase!=='review'||slots.every(s=>values[key(s.kind,s.pos)]===s.expected);
+ $('new').textContent=attempted?'Następne zadanie':'Nowe zadanie';
+}
+function enter(n){if(phase!=='editing')return;values[active]=String(n);render()}
+function remove(){if(phase!=='editing')return;values[active]='';render()}
 function check(){
- if(finished)return;finished=true;
+ if(phase!=='editing')return;
  const good=slots.filter(s=>values[key(s.kind,s.pos)]===s.expected).length;
- draw('answer',true);$('solution').classList.add('visible');
+ if(!attempted){
+  if(results.length===10){results=[];series++}
+  results.push(good===slots.length);attempted=true;
+ }
+ phase='review';draw('answer',true);$('solution').classList.add('visible');
  $('score').textContent='Poprawnych kratek: '+good+' z '+slots.length+'.';
  $('status').textContent=good===slots.length?'Brawo! Wszystko poprawnie.':'Porównaj swoje wpisy z rozwiązaniem.';
- render();
+ progress();render();
+}
+function correct(){
+ if(phase!=='review')return;
+ phase='editing';$('solution').classList.remove('visible');$('status').textContent='Popraw działanie i sprawdź ponownie.';render();
+}
+function next(){
+ if(attempted)taskIndex++;
+ else if(!confirm('Pominąć bieżące zadanie? Nie zostanie ocenione.'))return;
+ setup();
 }
 for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.addEventListener('click',()=>enter(n));$('keys').append(b)}
-$('delete').addEventListener('click',remove);$('check').addEventListener('click',check);$('new').addEventListener('click',setup);
-$('length1').addEventListener('change',setup);$('length2').addEventListener('change',setup);
-document.addEventListener('keydown',e=>{if(e.target.tagName==='SELECT')return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
+$('delete').addEventListener('click',remove);$('check').addEventListener('click',check);$('correct').addEventListener('click',correct);$('new').addEventListener('click',next);
+$('level').addEventListener('change',()=>{level=Number($('level').value);taskIndex=0;setup()});
+document.addEventListener('keydown',e=>{if(['SELECT','BUTTON'].includes(e.target.tagName))return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
 setup();
 </script></body></html>
