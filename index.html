@@ -46,8 +46,8 @@ body.dark .rule{border-color:var(--ink)}
 @keyframes learn-move{from{transform:translate(18px,-30px) scale(1.35);opacity:.15}to{transform:translate(0,0) scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.learn-flash{animation:none}}
 @media(max-width:690px){.learn-layout{grid-template-columns:1fr}.learn-pane .math{--cell:clamp(29px,7vw,45px)}}
-.learn-flying-digit{position:fixed;z-index:100;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--surface);border-radius:5px}.learn-carry-source{display:inline-grid;place-items:center;margin:8px 0;padding:3px 12px;background:var(--entry);border:1px solid var(--grid);border-radius:6px}.learn-equation{font-family:Arial,sans-serif} .learn-sum{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;gap:0!important;white-space:nowrap;min-width:0!important}.learn-sum span{min-width:0!important;min-height:0!important;display:inline-block!important;flex:none;line-height:1.2}.learn-digit-used{opacity:.32}.learn-equation span{transition:opacity .25s ease} </style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.5.3</div></section>
+.learn-flying-digit{position:fixed;z-index:100;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--surface);border-radius:5px}.learn-carry-source{display:inline-grid;place-items:center;margin:8px 0;padding:3px 12px;background:var(--entry);border:1px solid var(--grid);border-radius:6px}.learn-equation{font-family:Arial,sans-serif} .learn-sum{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;gap:0!important;white-space:nowrap;min-width:0!important}.learn-sum span{min-width:0!important;min-height:0!important;display:inline-block!important;flex:none;line-height:1.2}.learn-digit-used{opacity:.32}.learn-equation span{transition:opacity .25s ease} .learn-column-highlight{background:var(--active)!important;box-shadow:inset 0 0 0 2px #3b82f6}.learn-prompt{font-weight:600;line-height:1.5;margin-bottom:10px}.learn-pane .entry{touch-action:manipulation} </style></head><body><main>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.6.0</div></section>
 <section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="learn-screen" hidden>
@@ -57,7 +57,7 @@ body.dark .rule{border-color:var(--ink)}
 <div id="learn-question" class="learn-question" aria-live="polite"></div>
 <div class="learn-controls"><button id="learn-prev">Wstecz</button><button class="primary" id="learn-next">Pokaż krok</button><button id="learn-reset">Od początku</button></div>
 </section>
-<section class="learn-pane"><h3>2. Spróbuj samodzielnie</h3><div class="math"><div class="column" id="learn-practice"></div></div>
+<section class="learn-pane"><h3>2. Spróbuj samodzielnie</h3><div id="learn-practice-prompt" class="learn-prompt"></div><div class="math"><div class="column" id="learn-practice"></div></div>
 <div class="keypad" id="learn-keys"></div><div class="learn-controls"><button id="learn-delete">Usuń</button><button class="primary" id="learn-check">Sprawdź moje działanie</button><button id="learn-new">Nowe przykłady</button></div><div id="learn-feedback" class="status" aria-live="polite"></div>
 </section></div></section>
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
@@ -70,7 +70,7 @@ body.dark .rule{border-color:var(--ink)}
 const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
 let sandboxCount=6,sandboxErrors=new Set();
-let learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnStage=0,learnBusy=false,learnValues={},learnActive='',learnFinished=false;
+let learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnStage=0,learnBusy=false,learnValues={},learnActive='',learnFinished=false,learnLayout=0,learnLayoutSteps=[];
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
 const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
@@ -344,7 +344,15 @@ function renderTestColumn(item,correct){
  }
  item.numbers.forEach((n,r)=>{
   const row=document.createElement('div');row.className='line';row.append(cell(r===item.numbers.length-1?'+':'','sign'));
-  for(let p=w-1;p>=0;p--)row.append(p>=String(n).length?cell(''):cell(String(digit(n,p))));
+  for(let p=w-1;p>=0;p--){
+   const k=key('n'+r,p),exists=p<String(n).length;
+   if(!exists){row.append(cell(''));continue}
+   if(interactive){row.append(put('n'+r,p,learnValues[k]??'',true));continue}
+   const shownDigit=learnLayout>=learnLayoutSteps.length||learnLayoutSteps.slice(0,learnLayout).some(x=>x.k===k);
+   const d=put('n'+r,p,shownDigit?String(digit(n,p)):'');
+   if(learnLayout<learnLayoutSteps.length&&learnLayoutSteps[learnLayout].k===k)d.classList.add('learn-column-highlight');
+   row.append(d);
+  }
   column.append(row);
  });
  const rule=document.createElement('div');rule.className='rule';column.append(rule);
@@ -430,6 +438,7 @@ function learningColumn(rootId,ns,shown,interactive){
    d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();learnActive=k;drawLearningPractice()}};
   }
   if(!interactive)d.dataset.demo=k;
+  if(!interactive&&learnLayout>=learnLayoutSteps.length&&learnIndex<learnSteps.length&&p===learnSteps[learnIndex].p)d.classList.add('learn-column-highlight');
   return d;
  };
  line(root,Array.from({length:w},(_,i)=>{
@@ -456,7 +465,7 @@ function learningState(){
   const s=learnSteps[i];shown.result[key('result',s.p)]=String(s.result);
   if(s.next&&s.p+1<learnSteps.length)shown.carry[key('carry',s.p+1)]=String(s.next);
  }
- if(learnIndex<learnSteps.length){
+ if(learnLayout>=learnLayoutSteps.length&&learnIndex<learnSteps.length){
   const s=learnSteps[learnIndex];
   if(learnStage>=2)shown.result[key('result',s.p)]=String(s.result);
   if(learnStage>=3&&s.next&&s.p+1<learnSteps.length)shown.carry[key('carry',s.p+1)]=String(s.next);
@@ -478,7 +487,9 @@ async function flyLearningDigit(source,target,value){
  moving.remove();
 }
 async function advanceLearning(){
- if(learnBusy||learnIndex>=learnSteps.length)return;
+ if(learnBusy)return;
+ if(learnLayout<learnLayoutSteps.length){learnLayout++;drawLearning();return}
+ if(learnIndex>=learnSteps.length)return;
  const s=learnSteps[learnIndex];
  if(learnStage===0){learnStage=1;drawLearning();return}
  if(learnStage===1){
@@ -501,11 +512,15 @@ function drawLearningPractice(){
 function drawLearning(){
  learningColumn('learn-demo',learnDemo,learningState(),false);
  drawLearningPractice();
- const done=learnIndex===learnSteps.length,box=$('learn-question');box.replaceChildren();
+ const placing=learnLayout<learnLayoutSteps.length,done=!placing&&learnIndex===learnSteps.length,box=$('learn-question');box.replaceChildren();
  const title=document.createElement('div');
- title.textContent=done?'Brawo! Demonstracja zakończona.':('Kolumna '+['jedności','dziesiątek','setek','tysięcy','dziesiątek tysięcy','setek tysięcy','milionów','dziesiątek milionów'][learnSteps[learnIndex].p]);
+ title.textContent=placing?'Najpierw układamy liczby w słupku':done?'Brawo! Demonstracja zakończona.':'Dodajemy podświetloną kolumnę';
  box.append(title);
- if(!done){
+ if(placing){
+  const item=learnLayoutSteps[learnLayout],tip=document.createElement('div');
+  tip.textContent='Działanie: '+learnDemo.join(' + ')+'. Naciśnij „Dalej”, aby umieścić cyfrę '+item.value+' we właściwej kratce.';
+  box.append(tip);
+ }else if(!done){
   const s=learnSteps[learnIndex],equation=document.createElement('div');equation.className='learn-equation';
   const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
   for(let i=0;i<terms.length;i++){
@@ -534,18 +549,24 @@ function drawLearning(){
    tip.textContent='Teraz przenieś '+s.next+' do następnej kolumny.';
   else tip.textContent='Naciśnij „Dalej”, aby przejść do następnej kolumny.';
   box.append(tip);
- }else {const tip=document.createElement('div');tip.textContent='Teraz rozwiąż podobne działanie po prawej stronie.';box.append(tip)}
- $('learn-prev').disabled=learnBusy||(learnIndex===0&&learnStage===0);
+ }else {const tip=document.createElement('div');tip.textContent='Teraz spróbuj samodzielnie rozwiązać podobne działanie.';box.append(tip)}
+ $('learn-prev').disabled=learnBusy&&(learnLayout===0&&learnIndex===0&&learnStage===0);
+ if(!learnBusy)$('learn-prev').disabled=learnLayout===0&&learnIndex===0&&learnStage===0;
  $('learn-next').disabled=learnBusy||done;
  $('learn-next').textContent='Dalej';
 }
 function startLearning(){
  level=Number($('level').value);mode='learn';
  [learnDemo,learnPractice]=learningPair();learnSteps=learningSteps(learnDemo);
- learnIndex=0;learnStage=0;learnBusy=false;learnValues={};learnFinished=false;
+ learnIndex=0;learnStage=0;learnBusy=false;learnLayout=0;learnValues={};learnFinished=false;
+ learnLayoutSteps=[];
+ for(let row=0;row<learnDemo.length;row++)for(let p=String(learnDemo[row]).length-1;p>=0;p--)
+  learnLayoutSteps.push({k:key('n'+row,p),value:String(digit(learnDemo[row],p))});
  const w=String(learnPractice[0]+learnPractice[1]).length;
- learnActive=key('result',0);
+ learnActive=key('n0',0);
  for(let p=0;p<w;p++){learnValues[key('result',p)]='';if(p>0)learnValues[key('carry',p)]=''}
+ for(let row=0;row<learnPractice.length;row++)for(let p=0;p<String(learnPractice[row]).length;p++)learnValues[key('n'+row,p)]='';
+ $('learn-practice-prompt').textContent='Ułóż w słupku i oblicz: '+learnPractice.join(' + ');
  $('learn-feedback').textContent='';
  $('learn-level').textContent='Tryb nauki · '+$('level').selectedOptions[0].textContent;
  show('learn-screen');drawLearning();
@@ -554,6 +575,7 @@ function learnEnter(n){if(screen!=='learn-screen'||!learnActive)return;learnValu
 function learnDelete(){if(screen!=='learn-screen'||!learnActive)return;learnValues[learnActive]='';drawLearningPractice()}
 function checkLearning(){
  const ns=learnPractice,w=String(ns[0]+ns[1]).length,sum=ns[0]+ns[1];let carry=0,errors=0;
+ for(let row=0;row<ns.length;row++)for(let p=0;p<String(ns[row]).length;p++)if(learnValues[key('n'+row,p)]!==String(digit(ns[row],p)))errors++;
  for(let p=0;p<w;p++){
   const v=String(digit(sum,p));if(learnValues[key('result',p)]!==v)errors++;
   const next=Math.floor((digit(ns[0],p)+digit(ns[1],p)+carry)/10);
@@ -563,7 +585,7 @@ function checkLearning(){
  $('learn-feedback').textContent=errors?'Sprawdź jeszcze raz. Błędnych lub pustych kratek: '+errors+'.':'Brawo! Całe działanie jest poprawne.';
  for(const d of $('learn-practice').querySelectorAll('[data-learn]')){
   const [kind,posText]=d.dataset.learn.split(':'),p=Number(posText);
-  const expected=kind==='result'?String(digit(sum,p)):(()=>{
+  const expected=kind.startsWith('n')?String(digit(ns[Number(kind.slice(1))],p)):kind==='result'?String(digit(sum,p)):(()=>{
    let c=0;for(let i=0;i<p;i++)c=Math.floor((digit(ns[0],i)+digit(ns[1],i)+c)/10);
    return c?String(c):'';
   })();
@@ -572,8 +594,8 @@ function checkLearning(){
  }
 }
 $('learn-next').onclick=advanceLearning;
-$('learn-prev').onclick=()=>{if(learnBusy)return;if(learnStage>0)learnStage--;else if(learnIndex>0){learnIndex--;learnStage=learnSteps[learnIndex].next&&learnSteps[learnIndex].p+1<learnSteps.length?3:2}drawLearning()};
-$('learn-reset').onclick=()=>{if(learnBusy)return;learnIndex=0;learnStage=0;drawLearning()};
+$('learn-prev').onclick=()=>{if(learnBusy)return;if(learnLayout<learnLayoutSteps.length){learnLayout=Math.max(0,learnLayout-1)}else if(learnStage>0)learnStage--;else if(learnIndex>0){learnIndex--;learnStage=learnSteps[learnIndex].next&&learnSteps[learnIndex].p+1<learnSteps.length?3:2}else learnLayout=learnLayoutSteps.length-1;drawLearning()};
+$('learn-reset').onclick=()=>{if(learnBusy)return;learnLayout=0;learnIndex=0;learnStage=0;drawLearning()};
 $('learn-pause').onclick=()=>{$('pause-dialog').hidden=false};
 $('learn-delete').onclick=learnDelete;$('learn-check').onclick=checkLearning;$('learn-new').onclick=startLearning;
 for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>learnEnter(n);$('learn-keys').append(b)}
