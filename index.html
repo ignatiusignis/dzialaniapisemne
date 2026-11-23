@@ -46,8 +46,8 @@ body.dark .rule{border-color:var(--ink)}
 @keyframes learn-move{from{transform:translate(18px,-30px) scale(1.35);opacity:.15}to{transform:translate(0,0) scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.learn-flash{animation:none}}
 @media(max-width:690px){.learn-layout{grid-template-columns:1fr}.learn-pane .math{--cell:clamp(29px,7vw,45px)}}
-</style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.5.0</div></section>
+.learn-flying-digit{position:fixed;z-index:100;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--surface);border-radius:5px}.learn-carry-source{display:inline-grid;place-items:center;margin:8px 0;padding:3px 12px;background:var(--entry);border:1px solid var(--grid);border-radius:6px}.learn-equation{font-family:Arial,sans-serif} </style></head><body><main>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.5.1</div></section>
 <section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="learn-screen" hidden>
@@ -70,7 +70,7 @@ body.dark .rule{border-color:var(--ink)}
 const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
 let sandboxCount=6,sandboxErrors=new Set();
-let learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnValues={},learnActive='',learnFinished=false;
+let learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnStage=0,learnBusy=false,learnValues={},learnActive='',learnFinished=false;
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
 const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
@@ -429,7 +429,7 @@ function learningColumn(rootId,ns,shown,interactive){
    d.tabIndex=0;d.setAttribute('role','button');
    d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();learnActive=k;drawLearningPractice()}};
   }
-  if(!interactive&&shown&&shown.animated===k)d.classList.add('learn-flash');
+  if(!interactive)d.dataset.demo=k;
   return d;
  };
  line(root,Array.from({length:w},(_,i)=>{
@@ -451,17 +451,49 @@ function learningColumn(rootId,ns,shown,interactive){
  }));
 }
 function learningState(){
- const shown={carry:{},result:{},animated:''};
+ const shown={carry:{},result:{}};
  for(let i=0;i<learnIndex;i++){
-  const s=learnSteps[i];
-  shown.result[key('result',s.p)]=String(s.result);
+  const s=learnSteps[i];shown.result[key('result',s.p)]=String(s.result);
   if(s.next&&s.p+1<learnSteps.length)shown.carry[key('carry',s.p+1)]=String(s.next);
  }
- if(learnIndex>0){
-  const s=learnSteps[learnIndex-1];
-  shown.animated=s.next&&s.p+1<learnSteps.length?key('carry',s.p+1):key('result',s.p);
+ if(learnIndex<learnSteps.length){
+  const s=learnSteps[learnIndex];
+  if(learnStage>=2)shown.result[key('result',s.p)]=String(s.result);
+  if(learnStage>=3&&s.next&&s.p+1<learnSteps.length)shown.carry[key('carry',s.p+1)]=String(s.next);
  }
  return shown;
+}
+async function flyLearningDigit(source,target,value){
+ if(!source||!target)return;
+ const from=source.getBoundingClientRect(),to=target.getBoundingClientRect();
+ const moving=document.createElement('span');moving.className='learn-flying-digit';
+ moving.textContent=String(value);
+ Object.assign(moving.style,{left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px'});
+ document.body.append(moving);
+ const dx=to.left+to.width/2-from.left-from.width/2,dy=to.top+to.height/2-from.top-from.height/2;
+ try{
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&moving.animate)
+   await moving.animate([{transform:'translate(0,0)'},{transform:'translate('+dx+'px,'+dy+'px)'}],{duration:800,easing:'ease-in-out'}).finished;
+ }catch(e){}
+ moving.remove();
+}
+async function advanceLearning(){
+ if(learnBusy||learnIndex>=learnSteps.length)return;
+ const s=learnSteps[learnIndex];
+ if(learnStage===0){learnStage=1;drawLearning();return}
+ if(learnStage===1){
+  learnBusy=true;$('learn-next').disabled=true;
+  const source=$('learn-result-digit'),target=$('learn-demo').querySelector('[data-demo="result:'+s.p+'"]');
+  await flyLearningDigit(source,target,s.result);
+  learnStage=2;learnBusy=false;drawLearning();return;
+ }
+ if(learnStage===2&&s.next&&s.p+1<learnSteps.length){
+  learnBusy=true;$('learn-next').disabled=true;
+  const source=$('learn-carry-digit'),target=$('learn-demo').querySelector('[data-demo="carry:'+(s.p+1)+'"]');
+  await flyLearningDigit(source,target,s.next);
+  learnStage=3;learnBusy=false;drawLearning();return;
+ }
+ learnIndex++;learnStage=0;drawLearning();
 }
 function drawLearningPractice(){
  learningColumn('learn-practice',learnPractice,null,true);
@@ -469,29 +501,37 @@ function drawLearningPractice(){
 function drawLearning(){
  learningColumn('learn-demo',learnDemo,learningState(),false);
  drawLearningPractice();
- const s=learnSteps[Math.min(learnIndex,learnSteps.length-1)],done=learnIndex===learnSteps.length;
- const box=$('learn-question');box.replaceChildren();
- const title=document.createElement('div');title.textContent=done?'Brawo! Demonstracja zakończona.':('Kolumna '+['jedności','dziesiątek','setek','tysięcy','dziesiątek tysięcy','setek tysięcy','milionów','dziesiątek milionów'][s.p]);box.append(title);
- const equation=document.createElement('div');equation.className='learn-equation';
- const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
- for(let i=0;i<terms.length;i++){if(i){const plus=document.createElement('span');plus.textContent='+';equation.append(plus)}const n=document.createElement('span');n.textContent=terms[i];equation.append(n)}
- const equals=document.createElement('span');equals.textContent='=';equation.append(equals);
- const result=document.createElement('span');result.textContent='?';equation.append(result);
- if(!done){box.append(equation);const tip=document.createElement('div');tip.textContent='Ile to jest? Pomyśl, a potem wybierz „Pokaż krok”.';box.append(tip)}
- else {const tip=document.createElement('div');tip.textContent='Teraz rozwiąż podobne działanie po prawej stronie.';box.append(tip)}
- if(learnIndex>0&&!done){
-  const previous=learnSteps[learnIndex-1],tip=document.createElement('div');
-  tip.textContent='Poprzedni krok: '+previous.sum+' → zapisaliśmy '+previous.result+(previous.next?', przenieśliśmy '+previous.next+' dalej.':'.');
+ const done=learnIndex===learnSteps.length,box=$('learn-question');box.replaceChildren();
+ const title=document.createElement('div');
+ title.textContent=done?'Brawo! Demonstracja zakończona.':('Kolumna '+['jedności','dziesiątek','setek','tysięcy','dziesiątek tysięcy','setek tysięcy','milionów','dziesiątek milionów'][learnSteps[learnIndex].p]);
+ box.append(title);
+ if(!done){
+  const s=learnSteps[learnIndex],equation=document.createElement('div');equation.className='learn-equation';
+  const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
+  for(let i=0;i<terms.length;i++){
+   if(i){const plus=document.createElement('span');plus.textContent='+';equation.append(plus)}
+   const n=document.createElement('span');n.textContent=terms[i];equation.append(n);
+  }
+  const equals=document.createElement('span');equals.textContent='=';equation.append(equals);
+  const result=document.createElement('span');result.id='learn-result-digit';
+  result.textContent=learnStage===0?'?':String(s.sum);equation.append(result);box.append(equation);
+  const tip=document.createElement('div');
+  if(learnStage===0)tip.textContent='Oblicz sumę i naciśnij „Dalej”.';
+  else if(learnStage===1)tip.textContent='Wynik: '+s.sum+'. Naciśnij „Dalej”, aby zapisać '+s.result+' w kratce.';
+  else if(learnStage===2&&s.next&&s.p+1<learnSteps.length){
+   tip.textContent='Teraz przenieś '+s.next+' do następnej kolumny.';
+   const carry=document.createElement('span');carry.id='learn-carry-digit';carry.className='learn-equation learn-carry-source';carry.textContent=String(s.next);box.append(carry);
+  }else tip.textContent='Naciśnij „Dalej”, aby przejść do następnej kolumny.';
   box.append(tip);
- }
- $('learn-prev').disabled=learnIndex===0;
- $('learn-next').disabled=done;
- $('learn-next').textContent=done?'Gotowe':'Pokaż krok';
+ }else {const tip=document.createElement('div');tip.textContent='Teraz rozwiąż podobne działanie po prawej stronie.';box.append(tip)}
+ $('learn-prev').disabled=learnBusy||(learnIndex===0&&learnStage===0);
+ $('learn-next').disabled=learnBusy||done;
+ $('learn-next').textContent='Dalej';
 }
 function startLearning(){
  level=Number($('level').value);mode='learn';
  [learnDemo,learnPractice]=learningPair();learnSteps=learningSteps(learnDemo);
- learnIndex=0;learnValues={};learnFinished=false;
+ learnIndex=0;learnStage=0;learnBusy=false;learnValues={};learnFinished=false;
  const w=String(learnPractice[0]+learnPractice[1]).length;
  learnActive=key('result',0);
  for(let p=0;p<w;p++){learnValues[key('result',p)]='';if(p>0)learnValues[key('carry',p)]=''}
@@ -520,9 +560,9 @@ function checkLearning(){
   d.classList.toggle('wrong',learnValues[d.dataset.learn]!==expected);
  }
 }
-$('learn-next').onclick=()=>{if(learnIndex<learnSteps.length){learnIndex++;drawLearning()}};
-$('learn-prev').onclick=()=>{learnIndex=Math.max(0,learnIndex-1);drawLearning()};
-$('learn-reset').onclick=()=>{learnIndex=0;drawLearning()};
+$('learn-next').onclick=advanceLearning;
+$('learn-prev').onclick=()=>{if(learnBusy)return;if(learnStage>0)learnStage--;else if(learnIndex>0){learnIndex--;learnStage=learnSteps[learnIndex].next&&learnSteps[learnIndex].p+1<learnSteps.length?3:2}drawLearning()};
+$('learn-reset').onclick=()=>{if(learnBusy)return;learnIndex=0;learnStage=0;drawLearning()};
 $('learn-pause').onclick=()=>{$('pause-dialog').hidden=false};
 $('learn-delete').onclick=learnDelete;$('learn-check').onclick=checkLearning;$('learn-new').onclick=startLearning;
 for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>learnEnter(n);$('learn-keys').append(b)}
