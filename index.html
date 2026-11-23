@@ -28,138 +28,221 @@ body.dark .entry{color:var(--ink)}
 body.dark .score{color:var(--muted)}
 body.dark .rule{border-color:var(--ink)}
 @media(max-width:460px){body{padding:5px}main{border-radius:12px;padding:12px;min-height:calc(100dvh - 10px)}.menu{min-height:calc(100dvh - 55px)}.workspace{margin-top:28px}.game-head{align-items:flex-start}}
-</style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.3.0</div></section>
-<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
+.test-review-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.test-review-item h3{margin:0 0 8px;font-size:16px}.test-review-item .math{--cell:clamp(25px,6vw,39px)}#test-review{max-height:65vh;overflow:auto}.carry .cell{font-size:20px}.menu .option select{width:100%}@media(max-width:600px){.math{--cell:clamp(24px,6vw,40px)}.workspace{gap:15px}} </style></head><body><main>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.0</div></section>
+<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
-<div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
-<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button><button id="new">Nowe zadanie</button></div><div id="status" class="status" aria-live="polite"></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div></section>
+<div id="test-heading" hidden><strong id="test-step"></strong></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
+<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button><button id="new">Nowe zadanie</button><button id="submit-test" hidden>Oddaj kartkówkę</button></div><div id="status" class="status" aria-live="polite"></div><div id="test-review" hidden></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div></section>
 <div class="dialog" id="pause-dialog" hidden><div class="dialog-inner"><h2>Pauza</h2><button class="primary" id="resume">Wznów</button><button id="restart">Zacznij od nowa</button><button id="pause-options">Opcje</button><button id="go-home">Powrót do menu</button></div></div>
 <div class="dialog" id="end-dialog" hidden><div class="dialog-inner"><h2>Dobra robota! 🎉</h2><p id="end-text"></p><button class="primary" id="next-series">Kolejna seria</button><button id="end-home">Menu główne</button></div></div>
 </main><script>
 'use strict';
-const $=id=>document.getElementById(id);
-const ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
-let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false;
-let level=3,series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
-const digit=(n,pos)=>Math.floor(n/10**pos)%10;
+const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
+let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
+let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
+const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
-const key=(kind,pos)=>kind+':'+pos;
-function difficulty(a,b){
- const width=Math.max(String(a).length,String(b).length);
- let carry=0,count=0,chain=0,maxChain=0,zeros=0;
- for(let p=0;p<width;p++){
-  const da=digit(a,p),db=digit(b,p),next=da+db+carry>=10?1:0;
+const total=()=>numbers.reduce((a,b)=>a+b,0);
+function difficulty(ns){
+ let carry=0,count=0,chain=0,maxChain=0;
+ for(let p=0;p<Math.max(...ns.map(n=>String(n).length));p++){
+  const sum=ns.reduce((s,n)=>s+digit(n,p),carry),next=Math.floor(sum/10);
   if(next){count++;chain++;maxChain=Math.max(chain,maxChain)}else chain=0;
-  if((da===0||db===0)&&p<Math.min(String(a).length,String(b).length))zeros++;
   carry=next;
  }
- return {count,maxChain,zeros};
+ return {count,maxChain};
 }
-function chooseLength(){
- const [lo,hi]=ranges[level-1],t=taskIndex%10;
- return t<3?lo:t>=7?hi:(Math.random()<.5?lo:hi);
+function chooseLength(lvl=level,index=taskIndex){
+ const [lo,hi]=ranges[lvl-1],t=index%10;
+ return t<3?lo:t>=7?hi:Math.random()<.5?lo:hi;
 }
-function acceptable(a,b){
- const d=difficulty(a,b),w=Math.max(String(a).length,String(b).length);
- if(level===1)return d.count<=1;
- if(level===2)return d.count>=1&&d.count<=Math.min(2,w);
- if(level===3)return d.count>=Math.min(2,w)&&d.count<=Math.min(4,w);
- if(level===4)return d.count>=Math.min(3,w)&&d.maxChain>=2;
+function acceptable(ns,lvl=level){
+ const d=difficulty(ns),w=Math.max(...ns.map(n=>String(n).length));
+ if(lvl===1)return d.count<=1;
+ if(lvl===2)return d.count>=1&&d.count<=Math.min(2,w);
+ if(lvl===3)return d.count>=Math.min(2,w)&&d.count<=Math.min(4,w);
+ if(lvl===4)return d.count>=Math.min(3,w)&&d.maxChain>=2;
  return d.count>=Math.min(4,w)&&d.maxChain>=3;
 }
-function generate(){
- const len=chooseLength();const otherLen=(taskIndex%2===1&&len>1)?len-1:len;let best=null;
- for(let i=0;i<4000;i++){
-  const a=randomNumber(len),b=randomNumber(otherLen),d=difficulty(a,b);
-  if(acceptable(a,b))return [a,b];
-  if(!best||d.count>best.d.count)best={a,b,d};
+function generate(lvl=level,index=taskIndex,m=mode){
+ const len=m==='test'?ranges[lvl-1][1]:chooseLength(lvl,index);
+ const count=m==='multi'?Math.min(6,3+Math.floor(index/3)):2;
+ let best=null,bestScore=-Infinity;
+ for(let i=0;i<5000;i++){
+  const ns=Array.from({length:count},(_,j)=>randomNumber((index%2===1&&j===count-1)?Math.max(1,len-1):len));
+  if(acceptable(ns,lvl))return ns;
+  const d=difficulty(ns),score=lvl===1?-d.count:d.count;
+  if(score>bestScore){best=ns;bestScore=score}
  }
- return [best.a,best.b];
+ return best;
 }
-function progress(){
- $('series-label').textContent='Seria '+series;
- $('counter').textContent=results.filter(x=>x).length+'/'+results.length;
- const root=$('progress');root.replaceChildren();
- for(let i=0;i<10;i++){
-  const c=document.createElement('span');
-  if(i<results.length){c.className=results[i]?'ok':'bad';c.textContent=results[i]?'✓':'×'}
-  root.append(c);
- }
-}
-function setup(){
- numbers=generate();const total=numbers[0]+numbers[1];width=String(total).length;
- slots=[];let carry=0;
- for(let pos=0;pos<width;pos++){
-  const sum=digit(numbers[0],pos)+digit(numbers[1],pos)+carry;
-  slots.push({kind:'result',pos,expected:String(digit(total,pos))});
-  const next=Math.floor(sum/10);
-  if(pos<width-1)slots.push({kind:'carry',pos:pos+1,expected:next?String(next):''});
+function buildSlots(){
+ const sum=total();width=String(sum).length;slots=[];let carry=0;
+ for(let p=0;p<width;p++){
+  const col=numbers.reduce((s,n)=>s+digit(n,p),carry),next=Math.floor(col/10);
+  slots.push({kind:'result',pos:p,expected:String(digit(sum,p))});
+  if(p<width-1)slots.push({kind:'carry',pos:p+1,expected:next?String(next):''});
   carry=next;
  }
- values={};for(const s of slots)values[key(s.kind,s.pos)]='';
- active=key('result',0);phase='editing';attempted=false;
- $('solution').classList.remove('visible');$('status').textContent='';render();progress();
+}
+function slot(kind,pos,expected){const k=key(kind,pos);slots.push({kind,pos,expected:String(expected)});editable.add(k);values[k]=''}
+function puzzleSolutions(keys){
+ const unknown=keys.map(k=>({k,kind:k.split(':')[0],pos:Number(k.split(':')[1])}));
+ const fixed=display,base=numbers.slice(),target=total();
+ let count=0;
+ function visit(i,assignment){
+  if(count>1)return;
+  if(i===unknown.length){
+   const ns=base.slice();let sum=target;
+   for(const item of unknown){
+    const value=assignment[item.k];
+    if(item.kind.startsWith('n')){
+     const row=Number(item.kind.slice(1)),p=item.pos;
+     ns[row]=ns[row]-digit(ns[row],p)*10**p+value*10**p;
+    }else if(item.kind==='result')sum=sum-digit(sum,item.pos)*10**item.pos+value*10**item.pos;
+   }
+   if(ns.reduce((a,b)=>a+b,0)===sum)count++;
+   return;
+  }
+  const item=unknown[i],orig=item.kind==='result'?digit(target,item.pos):digit(base[Number(item.kind.slice(1))],item.pos);
+  for(let v=0;v<=9;v++){
+   if(item.kind.startsWith('n')&&item.pos===String(base[Number(item.kind.slice(1))]).length-1&&v===0)continue;
+   if(item.kind==='result'&&item.pos===String(target).length-1&&v===0)continue;
+   assignment[item.k]=v;visit(i+1,assignment);if(count>1)return;
+  }
+ }
+ visit(0,{});return count;
+}
+function setupPuzzle(){
+ editable=new Set();display={};values={};
+ for(let r=0;r<numbers.length;r++)for(let p=0;p<String(numbers[r]).length;p++)display[key('n'+r,p)]=String(digit(numbers[r],p));
+ for(const s of slots)display[key(s.kind,s.pos)]=s.expected;
+ if(mode==='missing'){
+  const r=Math.floor(Math.random()*2);
+  for(let p=0;p<String(numbers[r]).length;p++){const k=key('n'+r,p);editable.add(k);values[k]=''}
+ }else if(mode==='gaps'){
+  const candidates=[];
+  for(let r=0;r<numbers.length;r++)for(let p=0;p<String(numbers[r]).length;p++)candidates.push(key('n'+r,p));
+  for(const s of slots.filter(s=>s.kind==='result'))candidates.push(key(s.kind,s.pos));
+  candidates.sort(()=>Math.random()-.5);
+  const target=[1,2,3,4,6][level-1],selected=[];
+  for(const k of candidates){
+   if(selected.length>=target)break;
+   const trial=[...selected,k];
+   if(trial.length<=5&&puzzleSolutions(trial)===1)selected.push(k);
+  }
+  for(const k of selected){editable.add(k);values[k]=''}
+ }else if(mode==='repair'){
+  const count=[1,1,2,3,4][level-1];
+  const candidates=slots.filter(s=>s.kind==='result').map(s=>key(s.kind,s.pos));
+  candidates.sort(()=>Math.random()-.5);
+  for(const k of candidates.slice(0,count)){
+   const expected=Number(display[k]);values[k]=String((expected+1+Math.floor(Math.random()*8))%10);editable.add(k);
+  }
+  // Pozostałe cyfry są poprawne i nie wymagają przepisywania.
+ }else{
+  for(const s of slots){const k=key(s.kind,s.pos);editable.add(k);values[k]=''}
+ }
+ active=[...editable][0]||'';phase='editing';attempted=false;
+ $('solution').classList.remove('visible');$('status').textContent='';$('test-review').hidden=true;render();progress();
+}
+function setup(ns){
+ numbers=ns||generate();buildSlots();setupPuzzle();
 }
 function cell(content,cls=''){const d=document.createElement('div');d.className='cell '+cls;d.textContent=content??'';return d}
 function line(parent,arr,cls=''){const d=document.createElement('div');d.className='line '+cls;d.append(cell('','sign'));arr.forEach(c=>d.append(c));parent.append(d)}
-function makeEntry(kind,pos,correct){
- const k=key(kind,pos),slot=slots.find(s=>key(s.kind,s.pos)===k);
- const expected=slot?.expected??'',value=correct?expected:values[k]??'';
- const locked=phase!=='editing';
- const d=cell(value,'entry'+(!correct&&active===k&&!locked?' active':'')+(!correct&&locked?(values[k]===expected?' right':' wrong'):''));
- if(!correct&&!locked){d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label',(kind==='carry'?'Przeniesienie':'Wynik')+' kolumna '+(pos+1));d.addEventListener('click',()=>{active=k;render()});d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}})}
- return d;
-}
-function draw(target,correct){
- const root=$(target);root.replaceChildren();
- if(width>1)line(root,Array.from({length:width},(_,i)=>{const pos=width-1-i;return pos===0?cell(''):makeEntry('carry',pos,correct)}),'carry');
- numbers.forEach((n,index)=>{
-  const chars=String(n).padStart(width,' ').split('');
-  const row=document.createElement('div');row.className='line';row.append(cell(index===numbers.length-1?'+':'','sign'));
-  chars.forEach(ch=>row.append(cell(ch===' '?'':ch)));root.append(row);
+function draw(target,correct=false,container){
+ const root=container||$(target);root.replaceChildren();
+ const get=(kind,pos,expected)=>{
+  const k=key(kind,pos),canEdit=editable.has(k),value=correct?expected:(canEdit?values[k]??'':display[k]??expected);
+  const locked=phase!=='editing'||testReview;
+  const d=cell(value,canEdit?'entry'+(!correct&&active===k&&!locked?' active':'')+(!correct&&locked&&mode!=='test'?(value===expected?' right':' wrong'):''):'');
+  if(!correct&&canEdit&&!locked){
+   d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label','Cyfra '+(pos+1));
+   d.onclick=()=>{active=k;render()};
+   d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}};
+  }
+  return d;
+ };
+ if(mode!=='missing'&&mode!=='gaps'&&mode!=='repair'&&width>1){
+  line(root,Array.from({length:width},(_,i)=>{const p=width-1-i,s=slots.find(x=>x.kind==='carry'&&x.pos===p);return s?get('carry',p,s.expected):cell('')}),'carry');
+ }else if(width>1)line(root,Array.from({length:width},(_,i)=>{const p=width-1-i;return cell('')}),'carry');
+ numbers.forEach((n,r)=>{
+  const row=document.createElement('div');row.className='line';row.append(cell(r===numbers.length-1?'+':'','sign'));
+  for(let p=width-1;p>=0;p--)row.append(p>=String(n).length?cell(''):get('n'+r,p,String(digit(n,p))));
+  root.append(row);
  });
  const rule=document.createElement('div');rule.className='rule';root.append(rule);
- line(root,Array.from({length:width},(_,i)=>makeEntry('result',width-1-i,correct)));
+ line(root,Array.from({length:width},(_,i)=>{const p=width-1-i;return get('result',p,String(digit(total(),p)))}));
+}
+function allGood(){return [...editable].every(k=>values[k]===display[k])}
+function progress(){
+ $('series-label').textContent='Seria '+series;
+ $('counter').textContent=results.filter(Boolean).length+'/'+results.length;
+ const root=$('progress');root.replaceChildren();
+ for(let i=0;i<10;i++){const c=document.createElement('span');if(i<results.length){c.className=results[i]?'ok':'bad';c.textContent=results[i]?'✓':'×'}root.append(c)}
+ $('test-heading').hidden=mode!=='test';$('test-step').textContent='Kartkówka — zadanie '+(taskIndex+1)+' z 5';
+ document.querySelector('.progress-head').hidden=mode==='test';$('progress').hidden=mode==='test';
 }
 function render(){
- draw('exercise',false);
- $('delete').disabled=phase!=='editing';
- $('check').hidden=phase!=='editing';
- $('correct').hidden=phase!=='review'||slots.every(s=>values[key(s.kind,s.pos)]===s.expected);
- $('new').textContent=attempted?'Następne zadanie':'Nowe zadanie';
+ draw('exercise');$('delete').disabled=phase!=='editing';
+ $('check').hidden=phase!=='editing'||mode==='test';
+ $('correct').hidden=phase!=='review'||allGood()||mode==='test';
+ $('new').textContent=mode==='test'?'Następne zadanie':attempted?'Następne zadanie':'Nowe zadanie';
+ $('new').hidden=mode==='test'&&taskIndex===4;
+ $('submit-test').hidden=mode!=='test'||taskIndex!==4||phase==='done';
 }
-function enter(n){if(phase!=='editing')return;values[active]=String(n);render()}
-function remove(){if(phase!=='editing')return;values[active]='';render()}
+function enter(n){if(phase!=='editing'||!active)return;values[active]=String(n);render()}
+function remove(){if(phase!=='editing'||!active)return;values[active]='';render()}
 function check(){
- if(phase!=='editing')return;
- const good=slots.filter(s=>values[key(s.kind,s.pos)]===s.expected).length;
+ if(phase!=='editing'||mode==='test')return;
+ const good=allGood(),num=[...editable].filter(k=>values[k]===display[k]).length;
  if(!attempted){
-  results.push(good===slots.length);attempted=true;
-  if(results.length===10){$('end-text').textContent='Wynik serii: '+results.filter(Boolean).length+'/10. Możesz rozpocząć kolejną serię.';$('end-dialog').hidden=false;}
+  results.push(good);attempted=true;
+  if(results.length===10){$('end-text').textContent='Wynik serii: '+results.filter(Boolean).length+'/10.';$('end-dialog').hidden=false}
  }
  phase='review';draw('answer',true);$('solution').classList.add('visible');
- $('score').textContent='Poprawnych kratek: '+good+' z '+slots.length+'.';
- $('status').textContent=good===slots.length?'Brawo! Wszystko poprawnie.':'Porównaj swoje wpisy z rozwiązaniem.';
+ $('score').textContent='Poprawnych pól: '+num+' z '+editable.size+'.';
+ $('status').textContent=good?'Brawo! Wszystko poprawnie.':'Porównaj swoje wpisy z rozwiązaniem.';
  progress();render();
 }
-function correct(){
- if(phase!=='review')return;
- phase='editing';$('solution').classList.remove('visible');$('status').textContent='Popraw działanie i sprawdź ponownie.';render();
-}
+function correct(){if(phase!=='review')return;phase='editing';$('solution').classList.remove('visible');$('status').textContent='Popraw działanie i sprawdź ponownie.';render()}
+function snapshot(){return {numbers:numbers.slice(),values:{...values},editable:[...editable],display:{...display},level,taskIndex}}
 function next(){
+ if(mode==='test'){
+  if(taskIndex>=4)return;
+  testItems.push(snapshot());taskIndex++;level=taskIndex+1;setup(generate(level,7,'test'));return;
+ }
  if(results.length===10){finishSeries();return}
- if(attempted)taskIndex++;
- else if(!confirm('Pominąć bieżące zadanie? Nie zostanie ocenione.'))return;
+ if(attempted)taskIndex++;else if(!confirm('Pominąć bieżące zadanie? Nie zostanie ocenione.'))return;
  setup();
 }
-for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.addEventListener('click',()=>enter(n));$('keys').append(b)}
-$('delete').addEventListener('click',remove);$('check').addEventListener('click',check);$('correct').addEventListener('click',correct);$('new').addEventListener('click',next);
-
-function show(id){for(const el of document.querySelectorAll('.screen'))el.hidden=el.id!==id;screen=id}
 function finishSeries(){results=[];series++;taskIndex=0;$('end-dialog').hidden=true;setup()}
-function startGame(){level=Number($('level').value);series=1;results=[];taskIndex=0;$('game-level').textContent=$('level').selectedOptions[0].textContent;setup();show('game')}
+function submitTest(){
+ if(mode!=='test'||taskIndex!==4)return;
+ testItems.push(snapshot());phase='done';testReview=true;
+ const root=$('test-review');root.replaceChildren();let score=0;
+ for(let i=0;i<testItems.length;i++){
+  const item=testItems[i],ok=item.editable.every(k=>item.values[k]===item.display[k]);if(ok)score++;
+  const block=document.createElement('div');block.className='test-review-item';
+  const title=document.createElement('h3');title.textContent='Zadanie '+(i+1)+' — '+(ok?'✓ poprawne':'× błędne');block.append(title);
+  const info=document.createElement('div');info.textContent=item.numbers.join(' + ')+' = '+item.numbers.reduce((a,b)=>a+b,0);block.append(info);
+  if(!ok){const note=document.createElement('p');note.textContent='Twoje wpisy: '+item.editable.map(k=>k+' = '+(item.values[k]||'puste')).join(', ');block.append(note);
+   const answer=document.createElement('p');answer.textContent='Poprawne wpisy: '+item.editable.map(k=>k+' = '+item.display[k]).join(', ');block.append(answer)}
+  root.append(block);
+ }
+ $('status').textContent='Kartkówka zakończona. Ocena: '+score+'/5.';
+ root.hidden=false;$('new').hidden=true;$('submit-test').hidden=true;$('delete').disabled=true;$('check').hidden=true;
+}
+function show(id){for(const el of document.querySelectorAll('.screen'))el.hidden=el.id!==id;screen=id}
+function startGame(){
+ mode=$('mode').value;level=mode==='test'?1:Number($('level').value);
+ series=1;results=[];taskIndex=0;testItems=[];testReview=false;
+ $('game-level').textContent=mode==='test'?'Kartkówka':$('level').selectedOptions[0].textContent+' · '+$('mode').selectedOptions[0].textContent;
+ setup(mode==='test'?generate(1,7,'test'):undefined);show('game');
+}
 function openOptions(from){optionsFrom=from;if(from==='game')$('pause-dialog').hidden=true;show('options')}
 function applyOptions(){
  const sizes={small:'clamp(18px,4.2vw,25px)',normal:'clamp(20px,5vw,30px)',large:'clamp(24px,6vw,38px)'};
@@ -167,18 +250,18 @@ function applyOptions(){
  document.body.classList.toggle('dark',$('theme').value==='dark');
  try{localStorage.setItem('written-addition-options',JSON.stringify({size:$('font-size').value,theme:$('theme').value}))}catch(e){}
 }
+for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>enter(n);$('keys').append(b)}
+$('delete').onclick=remove;$('check').onclick=check;$('correct').onclick=correct;$('new').onclick=next;$('submit-test').onclick=submitTest;
 try{const saved=JSON.parse(localStorage.getItem('written-addition-options')||'{}');if(['small','normal','large'].includes(saved.size))$('font-size').value=saved.size;if(['light','dark'].includes(saved.theme))$('theme').value=saved.theme}catch(e){}
 $('home-new').onclick=()=>show('choose');$('home-options').onclick=()=>openOptions('home');
 $('choose-back').onclick=()=>show('home');$('start').onclick=startGame;
-$('pause').onclick=()=>{$('pause-dialog').hidden=false};
-$('resume').onclick=()=>{$('pause-dialog').hidden=true};
-$('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){series=1;results=[];taskIndex=0;setup();$('pause-dialog').hidden=true}};
+$('pause').onclick=()=>{$('pause-dialog').hidden=false};$('resume').onclick=()=>{$('pause-dialog').hidden=true};
+$('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){startGame();$('pause-dialog').hidden=true}};
 $('go-home').onclick=()=>{$('pause-dialog').hidden=true;show('home')};
 $('pause-options').onclick=()=>openOptions('game');
 $('options-back').onclick=()=>{show(optionsFrom);if(optionsFrom==='game')$('pause-dialog').hidden=false};
 $('font-size').onchange=applyOptions;$('theme').onchange=applyOptions;
 $('next-series').onclick=finishSeries;$('end-home').onclick=()=>{$('end-dialog').hidden=true;show('home')};
-applyOptions();
-document.addEventListener('keydown',e=>{if(['SELECT','BUTTON'].includes(e.target.tagName))return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
-show('home');
+document.addEventListener('keydown',e=>{if(screen!=='game'||!$('pause-dialog').hidden||!$('end-dialog').hidden||['SELECT','BUTTON'].includes(e.target.tagName))return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
+applyOptions();show('home');
 </script></body></html>
