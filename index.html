@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Działania pisemne – Pan Ignacy</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#182234;background:#fff}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:22px 12px}h1{font-size:25px;margin:0 0 6px}p{color:#526074;margin:8px 0 18px}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}button,select{font:inherit;border:1px solid #c7d0df;border-radius:9px;padding:11px 15px;background:#f5f7fb;color:#17243a;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #93c5fd}button.primary{background:#2563eb;color:white;border-color:#2563eb}button:disabled{opacity:.45;cursor:default}.workspace{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start}.panel{min-width:0;max-width:100%}.panel h2{font-size:17px}.math{--cell:clamp(29px,7vw,48px);overflow-x:auto;max-width:100%;padding:10px 2px 14px}.column{width:max-content;margin:auto}.line{display:flex;align-items:center;height:var(--cell)}.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,5vw,30px);font-weight:600;font-variant-numeric:tabular-nums}.sign{width:var(--cell);font-size:28px}.entry{background:#263244;color:white;border:2px solid white;border-radius:6px}.entry.active{background:#2563eb;border-color:#93c5fd;box-shadow:0 0 0 2px #93c5fd}.entry.filled{background:#334155}.entry.wrong{background:#b91c1c}.entry.right{background:#166534}.carry .entry{height:calc(var(--cell)*.72);font-size:20px}.carry{height:calc(var(--cell)*.8)}.rule{border-top:3px solid #182234;margin:4px 0}.keypad{display:grid;grid-template-columns:repeat(5,minmax(45px,70px));gap:9px;margin:16px 0}.keypad button{font-size:23px;font-weight:bold;min-height:58px}.status{min-height:26px;font-weight:600}.solution{display:none}.solution.visible{display:block}.hint{font-size:13px;color:#64748b} @media(max-width:460px){main{padding:15px 8px}.workspace{gap:16px}.keypad{grid-template-columns:repeat(5,1fr)}.keypad button{padding:10px 0}}
+</style></head><body><main>
+<h1>Działania pisemne</h1><p>Dodawanie liczb naturalnych · wersja testowa 0.1.0</p>
+<div class="toolbar"><label>Liczba cyfr <select id="length"><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></label><button id="new">Nowe zadanie</button></div>
+<div class="workspace"><section class="panel"><h2>Twoje działanie</h2><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="undo">↶ Cofnij</button><button id="check" class="primary">Sprawdź</button></div><div id="status" class="status" aria-live="polite"></div><div class="hint">Wpisuj od jedności. Gdy potrzeba, uzupełnij przeniesienie nad następną kolumną. Możesz też użyć cyfr na klawiaturze.</div></section><section class="panel solution" id="solution"><h2>Poprawne rozwiązanie</h2><div class="math"><div class="column" id="answer"></div></div><p id="score"></p></section></div>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+let numbers=[],width=0,steps=[],values=[],cursor=0,finished=false;
+const digit=(n,pos)=>Math.floor(n/10**pos)%10;
+const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
+function setup(){
+ const len=Number($('length').value);numbers=[randomNumber(len),randomNumber(len)];
+ const total=numbers.reduce((a,b)=>a+b,0);width=String(total).length;
+ steps=[];let carry=0;
+ for(let pos=0;pos<width;pos++){
+   const sum=numbers.reduce((a,n)=>a+digit(n,pos),carry);
+   steps.push({kind:'result',pos,expected:sum%10});
+   const next=Math.floor(sum/10);
+   if(next>0&&pos<width-1)steps.push({kind:'carry',pos:pos+1,expected:next});
+   carry=next;
+ }
+ values=Array(steps.length).fill(null);cursor=0;finished=false;
+ $('solution').classList.remove('visible');$('status').textContent='';render();
+}
+function cell(content,cls=''){const d=document.createElement('div');d.className='cell '+cls;d.textContent=content??'';return d}
+function line(parent,arr,cls=''){const d=document.createElement('div');d.className='line '+cls;d.append(cell('', 'sign'));arr.forEach(c=>d.append(c));parent.append(d)}
+function draw(target,correct){
+ const root=$(target);root.replaceChildren();
+ const carryCells=Array.from({length:width},()=>cell(''));
+ for(let pos=0;pos<width;pos++){
+   const i=steps.findIndex(s=>s.kind==='carry'&&s.pos===pos);
+   if(i>=0)carryCells[width-1-pos]=cell(correct?steps[i].expected:values[i]??'','entry'+(!correct&&cursor===i&&!finished?' active':'')+(!correct&&finished?(values[i]===steps[i].expected?' right':' wrong'):''));
+ }
+ if(steps.some(s=>s.kind==='carry'))line(root,carryCells,'carry');
+ numbers.forEach((n,index)=>{
+  const chars=String(n).padStart(width,' ').split('');
+  const row=document.createElement('div');row.className='line';row.append(cell(index===numbers.length-1?'+':'','sign'));
+  chars.forEach(ch=>row.append(cell(ch===' '?'':ch)));root.append(row);
+ });
+ const rule=document.createElement('div');rule.className='rule';root.append(rule);
+ const cells=Array.from({length:width},(_,i)=>{
+  const pos=width-1-i,idx=steps.findIndex(s=>s.kind==='result'&&s.pos===pos);
+  if(idx<0)return cell('');
+  return cell(correct?steps[idx].expected:values[idx]??'','entry'+(!correct&&cursor===idx&&!finished?' active':'')+(!correct&&finished?(values[idx]===steps[idx].expected?' right':' wrong'):''));
+ });line(root,cells);
+}
+function render(){draw('exercise',false);$('undo').disabled=finished||cursor===0;$('check').disabled=finished||cursor!==steps.length}
+function enter(n){if(finished||cursor>=steps.length)return;values[cursor++]=n;render();if(cursor===steps.length)$('status').textContent='Gotowe! Kliknij „Sprawdź”.';else $('status').textContent=''}
+function undo(){if(finished||cursor===0)return;values[--cursor]=null;$('status').textContent='';render()}
+function check(){if(finished||cursor!==steps.length)return;finished=true;const good=steps.filter((s,i)=>values[i]===s.expected).length;draw('answer',true);$('solution').classList.add('visible');$('score').textContent='Poprawnych wpisów: '+good+' z '+steps.length+'.';$('status').textContent=good===steps.length?'Brawo! Całe działanie wykonane poprawnie.':'Porównaj swoje działanie z poprawnym rozwiązaniem.';render()}
+for(let n=1;n<=9;n++){const b=document.createElement('button');b.textContent=n;b.addEventListener('click',()=>enter(n));$('keys').append(b)}
+const zero=document.createElement('button');zero.textContent='0';zero.addEventListener('click',()=>enter(0));$('keys').append(zero);
+$('undo').addEventListener('click',undo);$('check').addEventListener('click',check);$('new').addEventListener('click',setup);$('length').addEventListener('change',setup);
+document.addEventListener('keydown',e=>{if(e.target.tagName==='SELECT')return;if(/^[0-9]$/.test(e.key))enter(Number(e.key));else if(e.key==='Backspace')undo();else if(e.key==='Enter'&&cursor===steps.length)check()});
+setup();
+</script></body></html>
