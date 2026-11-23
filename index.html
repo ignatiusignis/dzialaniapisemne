@@ -29,7 +29,7 @@ body.dark .score{color:var(--muted)}
 body.dark .rule{border-color:var(--ink)}
 @media(max-width:460px){body{padding:5px}main{border-radius:12px;padding:12px;min-height:calc(100dvh - 10px)}.menu{min-height:calc(100dvh - 55px)}.workspace{margin-top:28px}.game-head{align-items:flex-start}}
 .test-review-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.test-review-item h3{margin:0 0 8px;font-size:16px}.test-review-item .math{--cell:clamp(25px,6vw,39px)}#test-review{max-height:65vh;overflow:auto}.carry .cell{font-size:20px}.menu .option select{width:100%}@media(max-width:600px){.math{--cell:clamp(24px,6vw,40px)}.workspace{gap:15px}} .test-columns{display:flex;flex-wrap:wrap;align-items:flex-start;gap:20px;margin-top:12px}.test-column{min-width:0;max-width:100%}.test-column h4{font-size:14px;margin:0 0 6px}.test-column .math{--cell:clamp(25px,5.5vw,39px);padding:4px;max-width:100%;overflow-x:auto}.test-column .column{margin:0}.test-column .cell{font-size:clamp(17px,4vw,25px)}.test-column .carry .cell{font-size:16px}.test-column .entry{cursor:default}.test-column .entry.right{background:#dcfce7;color:#14532d}.test-column .entry.wrong{background:#fee2e2;color:#991b1b}body.dark .test-column .entry.right{background:#14532d;color:#dcfce7}body.dark .test-column .entry.wrong{background:#7f1d1d;color:#fee2e2}#game.test-finished .workspace>.panel:first-child>.math,#game.test-finished .keypad,#game.test-finished .actions{display:none}#game.test-finished .workspace{margin-top:20px}#game.test-finished .workspace>.panel:first-child{width:100%}#game.test-finished #test-review{max-height:none;overflow:visible}@media(max-width:600px){.test-columns{gap:14px}.test-column{width:100%}} </style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.5</div></section>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.6</div></section>
 <section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
@@ -71,7 +71,7 @@ function generate(lvl=level,index=taskIndex,m=mode){
  const len=m==='test'?ranges[lvl-1][1]:chooseLength(lvl,index);
  const count=m==='multi'?Math.min(6,3+Math.floor(index/3)):2;
  let best=null,bestScore=-Infinity;
- for(let i=0;i<5000;i++){
+ for(let i=0;i<900;i++){
   const ns=Array.from({length:count},(_,j)=>randomNumber((index%2===1&&j===count-1)?Math.max(1,len-1):len));
   if(acceptable(ns,lvl))return ns;
   const d=difficulty(ns),score=lvl===1?-d.count:d.count;
@@ -89,32 +89,23 @@ function buildSlots(){
  }
 }
 function slot(kind,pos,expected){const k=key(kind,pos);slots.push({kind,pos,expected:String(expected)});editable.add(k);values[k]=''}
-function puzzleSolutions(keys){
- const unknown=keys.map(k=>({k,kind:k.split(':')[0],pos:Number(k.split(':')[1])}));
- const fixed=display,base=numbers.slice(),target=total();
- let count=0;
- function visit(i,assignment){
-  if(count>1)return;
-  if(i===unknown.length){
-   const ns=base.slice();let sum=target;
-   for(const item of unknown){
-    const value=assignment[item.k];
-    if(item.kind.startsWith('n')){
-     const row=Number(item.kind.slice(1)),p=item.pos;
-     ns[row]=ns[row]-digit(ns[row],p)*10**p+value*10**p;
-    }else if(item.kind==='result')sum=sum-digit(sum,item.pos)*10**item.pos+value*10**item.pos;
-   }
-   if(ns.reduce((a,b)=>a+b,0)===sum)count++;
-   return;
-  }
-  const item=unknown[i],orig=item.kind==='result'?digit(target,item.pos):digit(base[Number(item.kind.slice(1))],item.pos);
-  for(let v=0;v<=9;v++){
-   if(item.kind.startsWith('n')&&item.pos===String(base[Number(item.kind.slice(1))]).length-1&&v===0)continue;
-   if(item.kind==='result'&&item.pos===String(target).length-1&&v===0)continue;
-   assignment[item.k]=v;visit(i+1,assignment);if(count>1)return;
-  }
+// Jedna luka w kolumnie daje jednoznaczne rozwiązanie, ponieważ
+// przeniesienie z poprzedniej kolumny jest już określone.
+function chooseUniqueGaps(target){
+ const byColumn=new Map();
+ for(let r=0;r<numbers.length;r++)for(let p=0;p<String(numbers[r]).length;p++){
+  if(!byColumn.has(p))byColumn.set(p,[]);
+  byColumn.get(p).push(key('n'+r,p));
  }
- visit(0,{});return count;
+ for(const s of slots.filter(s=>s.kind==='result')){
+  if(!byColumn.has(s.pos))byColumn.set(s.pos,[]);
+  byColumn.get(s.pos).push(key(s.kind,s.pos));
+ }
+ const columns=[...byColumn.keys()].sort(()=>Math.random()-.5);
+ return columns.slice(0,Math.min(target,columns.length)).map(p=>{
+  const candidates=byColumn.get(p);
+  return candidates[Math.floor(Math.random()*candidates.length)];
+ });
 }
 function setupPuzzle(){
  editable=new Set();display={};values={};
@@ -124,16 +115,7 @@ function setupPuzzle(){
   const r=Math.floor(Math.random()*2);
   for(let p=0;p<String(numbers[r]).length;p++){const k=key('n'+r,p);editable.add(k);values[k]=''}
  }else if(mode==='gaps'){
-  const candidates=[];
-  for(let r=0;r<numbers.length;r++)for(let p=0;p<String(numbers[r]).length;p++)candidates.push(key('n'+r,p));
-  for(const s of slots.filter(s=>s.kind==='result'))candidates.push(key(s.kind,s.pos));
-  candidates.sort(()=>Math.random()-.5);
-  const target=[1,2,3,4,6][level-1],selected=[];
-  for(const k of candidates){
-   if(selected.length>=target)break;
-   const trial=[...selected,k];
-   if(trial.length<=5&&puzzleSolutions(trial)===1)selected.push(k);
-  }
+  const selected=chooseUniqueGaps([1,2,3,4,6][level-1]);
   for(const k of selected){editable.add(k);values[k]=''}
  }else if(mode==='repair'){
   const count=[1,1,2,3,4][level-1];
@@ -149,7 +131,7 @@ function setupPuzzle(){
  }
  if(['missing','gaps','repair'].includes(mode))for(const s of slots.filter(s=>s.kind==='carry')){const k=key(s.kind,s.pos);editable.add(k);values[k]=''}
  active=[...editable][0]||'';phase='editing';attempted=false;
- $('solution').classList.remove('visible');$('status').textContent='';$('test-review').hidden=true;render();progress();
+ $('solution').classList.remove('visible');$('status').textContent='';$('test-review').hidden=true;$('exercise').replaceChildren();render();progress();
 }
 function setup(ns){
  if(mode==='sandbox'){setupSandbox();return}
@@ -160,7 +142,7 @@ function setupSandbox(){
  for(let r=0;r<sandboxCount;r++)for(let p=0;p<7;p++){const k=key('n'+r,p);editable.add(k);values[k]=''}
  for(let p=0;p<8;p++){const k=key('result',p);editable.add(k);values[k]=''}
  for(let p=1;p<8;p++){const k=key('carry',p);editable.add(k);values[k]=''}
- active=key('n5',0);phase='editing';attempted=false;$('solution').classList.remove('visible');$('status').textContent='Wpisz składniki i wynik. Puste kratki po lewej stronie mogą pozostać niewypełnione.';render();progress();
+ active=key('n5',0);phase='editing';attempted=false;$('exercise').replaceChildren();$('solution').classList.remove('visible');$('status').textContent='Wpisz składniki i wynik. Puste kratki po lewej stronie mogą pozostać niewypełnione.';render();progress();
 }
 function cell(content,cls=''){const d=document.createElement('div');d.className='cell '+cls;d.textContent=content??'';return d}
 function line(parent,arr,cls=''){const d=document.createElement('div');d.className='line '+cls;d.append(cell('','sign'));arr.forEach(c=>d.append(c));parent.append(d)}
@@ -171,6 +153,7 @@ function draw(target,correct=false,container){
   const k=key(kind,pos),canEdit=editable.has(k),value=correct?expected:(canEdit?values[k]??'':display[k]??expected);
   const locked=phase!=='editing'||testReview;
   const d=cell(value,canEdit?'entry'+(!correct&&active===k&&!locked?' active':'')+(!correct&&locked&&mode!=='test'?(value===expected?' right':' wrong'):''):'');
+  if(!correct&&canEdit){d.dataset.key=k;}
   if(!correct&&canEdit&&!locked){
    d.setAttribute('role','button');d.tabIndex=0;d.setAttribute('aria-label','Cyfra '+(pos+1));
    d.onclick=()=>{active=k;render()};
@@ -194,7 +177,7 @@ function drawSandbox(target,correct=false,container){
  const root=container||$(target);root.replaceChildren();
  const entry=(kind,p)=>{
   const k=key(kind,p),value=values[k]||'',locked=phase!=='editing';
-  const d=cell(value,'entry'+(active===k&&!locked?' active':'')+(sandboxErrors.has(k)?' wrong':''));
+  const d=cell(value,'entry'+(active===k&&!locked?' active':'')+(sandboxErrors.has(k)?' wrong':''));d.dataset.key=k;
   if(!locked){d.setAttribute('role','button');d.tabIndex=0;d.onclick=()=>{active=k;render()};d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}}}
   return d;
  };
@@ -260,8 +243,21 @@ function progress(){
  $('test-heading').hidden=mode!=='test';$('test-step').textContent='Kartkówka — zadanie '+(taskIndex+1)+' z 5';
  document.querySelector('.progress-head').hidden=mode==='test'||mode==='sandbox';$('progress').hidden=mode==='test'||mode==='sandbox';
 }
+function refreshGrid(){
+ const root=$('exercise');
+ for(const d of root.querySelectorAll('[data-key]')){
+  const k=d.dataset.key,expected=display[k],value=values[k]??'';
+  d.textContent=value;
+  d.classList.toggle('active',phase==='editing'&&active===k);
+  if(mode==='sandbox')d.classList.toggle('wrong',sandboxErrors.has(k));
+  else if(phase==='review'&&mode!=='test'){
+   d.classList.toggle('right',value===expected);
+   d.classList.toggle('wrong',value!==expected);
+  }else{d.classList.remove('right','wrong')}
+ }
+}
 function render(){
- draw('exercise');$('delete').disabled=phase!=='editing';
+ if(!$('exercise').children.length)draw('exercise');else refreshGrid();$('delete').disabled=phase!=='editing';
  $('check').hidden=phase!=='editing'||mode==='test';
  $('correct').hidden=mode==='sandbox'||phase!=='review'||allGood()||mode==='test';
  $('new').textContent=mode==='sandbox'?'Wyczyść kratki':mode==='test'?'Następne zadanie':attempted?'Następne zadanie':'Nowe zadanie';
