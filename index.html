@@ -74,7 +74,7 @@ body.dark .rule{border-color:var(--ink)}
 .sandbox-config select{min-width:90px;min-height:44px}
 @media(min-width:850px){#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:start}#game:has(#sandbox-config:not([hidden])) .sandbox-config{grid-column:2;grid-row:1;align-self:start;flex-direction:column;align-items:flex-start;margin-top:10px}#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.math{grid-column:1;grid-row:1}#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.keypad,#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.actions,#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.status{grid-column:1/-1}}
 </style></head><body><main>
-<section class="screen menu" id="home"><h1>Dodawanie pisemne</h1><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button id="home-options">Opcje</button><div class="version">Wersja 0.7.7</div></section>
+<section class="screen menu" id="home"><h1>Dodawanie pisemne</h1><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button id="home-options">Opcje</button><div class="version">Wersja 0.7.8</div></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="learn-screen" hidden>
 <div class="game-head"><span class="level-label" id="learn-level">Tryb nauki</span><button id="learn-pause">☰ Pauza</button></div>
@@ -95,7 +95,7 @@ body.dark .rule{border-color:var(--ink)}
 'use strict';
 const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
-let sandboxCount=2,sandboxErrors=new Set();
+let sandboxCount=2,sandboxErrors=new Set(),sandboxChecked=false;
 let learnStepLevel=0,learnSolved=false,learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnStage=0,learnBusy=false,learnValues={},learnActive='',learnFinished=false,learnLayout=0,learnLayoutSteps=[];
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
 const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
@@ -196,7 +196,7 @@ function setup(ns){
  numbers=ns||generate();buildSlots();setupPuzzle();
 }
 function setupSandbox(){
- sandboxCount=Number($('sandbox-count').value);width=8;numbers=Array(sandboxCount).fill(0);slots=[];display={};values={};editable=new Set();sandboxErrors=new Set();
+ sandboxCount=Number($('sandbox-count').value);width=8;numbers=Array(sandboxCount).fill(0);slots=[];display={};values={};editable=new Set();sandboxErrors=new Set();sandboxChecked=false;
  for(let r=0;r<sandboxCount;r++)for(let p=0;p<7;p++){const k=key('n'+r,p);editable.add(k);values[k]=''}
  for(let p=0;p<8;p++){const k=key('result',p);editable.add(k);values[k]=''}
  for(let p=1;p<8;p++){const k=key('carry',p);editable.add(k);values[k]=''}
@@ -235,7 +235,7 @@ function drawSandbox(target,correct=false,container){
  const root=container||$(target);root.replaceChildren();
  const entry=(kind,p)=>{
   const k=key(kind,p),value=values[k]||'',locked=phase!=='editing';
-  const d=cell(value,'entry'+(active===k&&!locked?' active':'')+(sandboxErrors.has(k)?' wrong':''));d.dataset.key=k;
+  const d=cell(value,'entry'+(active===k&&!locked?' active':'')+(sandboxChecked?(sandboxErrors.has(k)?' wrong':value!==''?' right':'') :''));d.dataset.key=k;
   if(!locked){d.setAttribute('role','button');d.tabIndex=0;d.onclick=()=>{active=k;render()};d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();active=k;render()}}}
   return d;
  };
@@ -249,7 +249,7 @@ function drawSandbox(target,correct=false,container){
  line(root,Array.from({length:8},(_,i)=>entry('result',7-i)));
 }
 function checkSandbox(){
- sandboxErrors=new Set();
+ sandboxErrors=new Set();sandboxChecked=true;
  const ns=[],used=[];
  for(let r=0;r<sandboxCount;r++){
   const chars=Array.from({length:7},(_,i)=>values[key('n'+r,6-i)]||' ');
@@ -308,7 +308,10 @@ function refreshGrid(){
   const k=d.dataset.key,expected=display[k],value=values[k]??'';
   d.textContent=value;
   d.classList.toggle('active',phase==='editing'&&active===k);
-  if(mode==='sandbox')d.classList.toggle('wrong',sandboxErrors.has(k));
+  if(mode==='sandbox'){
+   d.classList.toggle('wrong',sandboxChecked&&sandboxErrors.has(k));
+   d.classList.toggle('right',sandboxChecked&&!sandboxErrors.has(k)&&value!=='');
+  }
   else if(phase==='review'&&mode!=='test'){
    d.classList.toggle('right',value===expected);
    d.classList.toggle('wrong',value!==expected);
@@ -323,8 +326,8 @@ function render(){
  $('new').hidden=mode==='test'&&taskIndex===4;
  $('submit-test').hidden=mode!=='test'||taskIndex!==4||phase==='done';
 }
-function enter(n){if(phase!=='editing'||!active)return;values[active]=String(n);sandboxErrors.delete(active);render()}
-function remove(){if(phase!=='editing'||!active)return;values[active]='';sandboxErrors.delete(active);render()}
+function enter(n){if(phase!=='editing'||!active)return;values[active]=String(n);sandboxErrors.delete(active);if(mode==='sandbox')sandboxChecked=false;render()}
+function remove(){if(phase!=='editing'||!active)return;values[active]='';sandboxErrors.delete(active);if(mode==='sandbox')sandboxChecked=false;render()}
 function check(){
  if(phase!=='editing'||mode==='test')return;
  if(mode==='sandbox'){checkSandbox();return}
