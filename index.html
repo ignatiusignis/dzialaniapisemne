@@ -60,6 +60,9 @@ function chooseLength(lvl=level,index=taskIndex){
  return t<3?lo:t>=7?hi:Math.random()<.5?lo:hi;
 }
 function acceptable(ns,lvl=level){
+ // Przy 3–6 składnikach przeniesienia są naturalnie częstsze;
+ // trudność stopniują liczba składników i długość liczb.
+ if(ns.length>2)return true;
  const d=difficulty(ns),w=Math.max(...ns.map(n=>String(n).length));
  if(lvl===1)return d.count<=1;
  if(lvl===2)return d.count>=1&&d.count<=Math.min(2,w);
