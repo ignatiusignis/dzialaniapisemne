@@ -28,10 +28,38 @@ body.dark .entry{color:var(--ink)}
 body.dark .score{color:var(--muted)}
 body.dark .rule{border-color:var(--ink)}
 @media(max-width:460px){body{padding:5px}main{border-radius:12px;padding:12px;min-height:calc(100dvh - 10px)}.menu{min-height:calc(100dvh - 55px)}.workspace{margin-top:28px}.game-head{align-items:flex-start}}
-.test-review-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.test-review-item h3{margin:0 0 8px;font-size:16px}.test-review-item .math{--cell:clamp(25px,6vw,39px)}#test-review{max-height:65vh;overflow:auto}.carry .cell{font-size:20px}.menu .option select{width:100%}@media(max-width:600px){.math{--cell:clamp(24px,6vw,40px)}.workspace{gap:15px}} .test-columns{display:flex;flex-wrap:wrap;align-items:flex-start;gap:20px;margin-top:12px}.test-column{min-width:0;max-width:100%}.test-column h4{font-size:14px;margin:0 0 6px}.test-column .math{--cell:clamp(25px,5.5vw,39px);padding:4px;max-width:100%;overflow-x:auto}.test-column .column{margin:0}.test-column .cell{font-size:clamp(17px,4vw,25px)}.test-column .carry .cell{font-size:16px}.test-column .entry{cursor:default}.test-column .entry.right{background:#dcfce7;color:#14532d}.test-column .entry.wrong{background:#fee2e2;color:#991b1b}body.dark .test-column .entry.right{background:#14532d;color:#dcfce7}body.dark .test-column .entry.wrong{background:#7f1d1d;color:#fee2e2}#game.test-finished .workspace>.panel:first-child>.math,#game.test-finished .keypad,#game.test-finished .actions{display:none}#game.test-finished .workspace{margin-top:20px}#game.test-finished .workspace>.panel:first-child{width:100%}#game.test-finished #test-review{max-height:none;overflow:visible}@media(max-width:600px){.test-columns{gap:14px}.test-column{width:100%}} </style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.4.6</div></section>
-<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
+.test-review-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0}.test-review-item h3{margin:0 0 8px;font-size:16px}.test-review-item .math{--cell:clamp(25px,6vw,39px)}#test-review{max-height:65vh;overflow:auto}.carry .cell{font-size:20px}.menu .option select{width:100%}@media(max-width:600px){.math{--cell:clamp(24px,6vw,40px)}.workspace{gap:15px}} .test-columns{display:flex;flex-wrap:wrap;align-items:flex-start;gap:20px;margin-top:12px}.test-column{min-width:0;max-width:100%}.test-column h4{font-size:14px;margin:0 0 6px}.test-column .math{--cell:clamp(25px,5.5vw,39px);padding:4px;max-width:100%;overflow-x:auto}.test-column .column{margin:0}.test-column .cell{font-size:clamp(17px,4vw,25px)}.test-column .carry .cell{font-size:16px}.test-column .entry{cursor:default}.test-column .entry.right{background:#dcfce7;color:#14532d}.test-column .entry.wrong{background:#fee2e2;color:#991b1b}body.dark .test-column .entry.right{background:#14532d;color:#dcfce7}body.dark .test-column .entry.wrong{background:#7f1d1d;color:#fee2e2}#game.test-finished .workspace>.panel:first-child>.math,#game.test-finished .keypad,#game.test-finished .actions{display:none}#game.test-finished .workspace{margin-top:20px}#game.test-finished .workspace>.panel:first-child{width:100%}#game.test-finished #test-review{max-height:none;overflow:visible}@media(max-width:600px){.test-columns{gap:14px}.test-column{width:100%}} 
+.learn-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:25px}
+.learn-pane{border:1px solid var(--border);border-radius:14px;padding:clamp(10px,2vw,20px);min-width:0}
+.learn-pane h3{font-size:16px;margin:0 0 12px}
+.learn-pane .math{--cell:clamp(27px,4.4vw,43px);padding:4px}
+.learn-pane .cell{font-size:var(--digit-font,clamp(20px,5vw,30px))}
+.learn-pane .carry .cell{font-size:calc(var(--cell)*.47)}
+.learn-question{min-height:85px;margin-top:12px;line-height:1.55}
+.learn-equation{display:inline-flex;gap:6px;align-items:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-variant-numeric:tabular-nums}
+.learn-equation span{display:inline-grid;place-items:center;min-width:30px;min-height:35px}
+.learn-controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.learn-controls button{flex:1 1 125px}
+.learn-pane .keypad{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.learn-pane .keypad button{min-height:46px;padding:5px}
+.learn-flash{animation:learn-move .65s ease-out}
+@keyframes learn-move{from{transform:translate(18px,-30px) scale(1.35);opacity:.15}to{transform:translate(0,0) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.learn-flash{animation:none}}
+@media(max-width:690px){.learn-layout{grid-template-columns:1fr}.learn-pane .math{--cell:clamp(29px,7vw,45px)}}
+</style></head><body><main>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.5.0</div></section>
+<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
+<section class="screen" id="learn-screen" hidden>
+<div class="game-head"><span class="level-label" id="learn-level">Tryb nauki</span><button id="learn-pause">☰ Pauza</button></div>
+<div class="learn-layout">
+<section class="learn-pane"><h3>1. Zobacz, jak to działa</h3><div class="math"><div class="column" id="learn-demo"></div></div>
+<div id="learn-question" class="learn-question" aria-live="polite"></div>
+<div class="learn-controls"><button id="learn-prev">Wstecz</button><button class="primary" id="learn-next">Pokaż krok</button><button id="learn-reset">Od początku</button></div>
+</section>
+<section class="learn-pane"><h3>2. Spróbuj samodzielnie</h3><div class="math"><div class="column" id="learn-practice"></div></div>
+<div class="keypad" id="learn-keys"></div><div class="learn-controls"><button id="learn-delete">Usuń</button><button class="primary" id="learn-check">Sprawdź moje działanie</button><button id="learn-new">Nowe przykłady</button></div><div id="learn-feedback" class="status" aria-live="polite"></div>
+</section></div></section>
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
 <div id="test-heading" hidden><strong id="test-step"></strong></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
 <div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button><button id="new">Nowe zadanie</button><button id="submit-test" hidden>Oddaj kartkówkę</button></div><div id="status" class="status" aria-live="polite"></div><div id="test-review" hidden></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div></section>
@@ -42,6 +70,7 @@ body.dark .rule{border-color:var(--ink)}
 const $=id=>document.getElementById(id),ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let level=3,mode='addition',series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
 let sandboxCount=6,sandboxErrors=new Set();
+let learnDemo=[],learnPractice=[],learnSteps=[],learnIndex=0,learnValues={},learnActive='',learnFinished=false;
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false,editable=new Set(),display={},testItems=[],testReview=false;
 const digit=(n,p)=>Math.floor(n/10**p)%10,key=(kind,pos)=>kind+':'+pos;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
@@ -339,13 +368,14 @@ function submitTest(){
 
 function show(id){for(const el of document.querySelectorAll('.screen'))el.hidden=el.id!==id;screen=id}
 function startGame(){
+ if($('mode').value==='learn'){startLearning();return}
  $('game').classList.remove('test-finished');
  mode=$('mode').value;level=mode==='test'?1:Number($('level').value);
  series=1;results=[];taskIndex=0;testItems=[];testReview=false;
  $('game-level').textContent=mode==='sandbox'?'Piaskownica':mode==='test'?'Kartkówka':$('level').selectedOptions[0].textContent+' · '+$('mode').selectedOptions[0].textContent;
  setup(mode==='test'?generate(1,7,'test'):undefined);show('game');
 }
-function openOptions(from){optionsFrom=from;if(from==='game')$('pause-dialog').hidden=true;show('options')}
+function openOptions(from){optionsFrom=from;if(from==='game'||from==='learn-screen')$('pause-dialog').hidden=true;show('options')}
 function applyOptions(){
  const sizes={small:'clamp(18px,4.2vw,25px)',normal:'clamp(20px,5vw,30px)',large:'clamp(24px,6vw,38px)'};
  document.documentElement.style.setProperty('--digit-font',sizes[$('font-size').value]);
@@ -359,12 +389,143 @@ $('home-new').onclick=()=>show('choose');$('home-options').onclick=()=>openOptio
 $('choose-back').onclick=()=>show('home');$('start').onclick=startGame;
 $('mode').onchange=()=>{document.querySelector('label[for="level"]').parentElement.hidden=$('mode').value==='sandbox'};
 $('pause').onclick=()=>{$('pause-dialog').hidden=false};$('resume').onclick=()=>{$('pause-dialog').hidden=true};
-$('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){startGame();$('pause-dialog').hidden=true}};
+$('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){if(screen==='learn-screen')startLearning();else startGame();$('pause-dialog').hidden=true}};
 $('go-home').onclick=()=>{$('pause-dialog').hidden=true;show('home')};
-$('pause-options').onclick=()=>openOptions('game');
-$('options-back').onclick=()=>{show(optionsFrom);if(optionsFrom==='game')$('pause-dialog').hidden=false};
+$('pause-options').onclick=()=>openOptions(screen==='learn-screen'?'learn-screen':'game');
+$('options-back').onclick=()=>{show(optionsFrom);if(optionsFrom==='game'||optionsFrom==='learn-screen')$('pause-dialog').hidden=false};
 $('font-size').onchange=applyOptions;$('theme').onchange=applyOptions;
 $('next-series').onclick=finishSeries;$('end-home').onclick=()=>{$('end-dialog').hidden=true;show('home')};
-document.addEventListener('keydown',e=>{if(screen!=='game'||!$('pause-dialog').hidden||!$('end-dialog').hidden||['SELECT','BUTTON'].includes(e.target.tagName))return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
+document.addEventListener('keydown',e=>{if(!['game','learn-screen'].includes(screen)||!$('pause-dialog').hidden||!$('end-dialog').hidden||['SELECT','BUTTON'].includes(e.target.tagName))return;if(screen==='learn-screen'){if(/^[0-9]$/.test(e.key))learnEnter(e.key);else if(e.key==='Backspace'||e.key==='Delete')learnDelete()}else if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
+
+function learningPair(){
+ const pairs=[
+  [[23,14],[32,25]],
+  [[47,35],[58,26]],
+  [[247,169],[358,276]],
+  [[2587,1768],[3469,2875]],
+  [[27865,19478],[35679,28654]]
+ ];
+ return pairs[level-1].map(ns=>ns.slice());
+}
+function learningSteps(ns){
+ const steps=[];let carry=0;
+ const w=String(ns[0]+ns[1]).length;
+ for(let p=0;p<w;p++){
+  const a=digit(ns[0],p),b=digit(ns[1],p),incoming=carry;
+  const sum=a+b+incoming,next=Math.floor(sum/10);
+  steps.push({p,a,b,incoming,sum,result:sum%10,next});
+  carry=next;
+ }
+ return steps;
+}
+function learningColumn(rootId,ns,shown,interactive){
+ const root=$(rootId);root.replaceChildren();const w=String(ns[0]+ns[1]).length;
+ const put=(kind,p,content,editable=false)=>{
+  const k=key(kind,p),d=cell(content,editable?'entry':'');
+  if(editable){
+   d.dataset.learn=k;
+   d.classList.toggle('active',learnActive===k);
+   d.onclick=()=>{learnActive=k;drawLearningPractice()};
+   d.tabIndex=0;d.setAttribute('role','button');
+   d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();learnActive=k;drawLearningPractice()}};
+  }
+  if(!interactive&&shown&&shown.animated===k)d.classList.add('learn-flash');
+  return d;
+ };
+ line(root,Array.from({length:w},(_,i)=>{
+  const p=w-1-i;if(p===0)return cell('');
+  const k=key('carry',p);
+  const value=interactive?(learnValues[k]??''):(shown?.carry[k]??'');
+  return put('carry',p,value,interactive);
+ }),'carry');
+ ns.forEach((n,r)=>{
+  const row=document.createElement('div');row.className='line';row.append(cell(r===1?'+':'','sign'));
+  for(let p=w-1;p>=0;p--)row.append(p>=String(n).length?cell(''):cell(String(digit(n,p))));
+  root.append(row);
+ });
+ const rule=document.createElement('div');rule.className='rule';root.append(rule);
+ line(root,Array.from({length:w},(_,i)=>{
+  const p=w-1-i,k=key('result',p);
+  const value=interactive?(learnValues[k]??''):(shown?.result[k]??'');
+  return put('result',p,value,interactive);
+ }));
+}
+function learningState(){
+ const shown={carry:{},result:{},animated:''};
+ for(let i=0;i<learnIndex;i++){
+  const s=learnSteps[i];
+  shown.result[key('result',s.p)]=String(s.result);
+  if(s.next&&s.p+1<learnSteps.length)shown.carry[key('carry',s.p+1)]=String(s.next);
+ }
+ if(learnIndex>0){
+  const s=learnSteps[learnIndex-1];
+  shown.animated=s.next&&s.p+1<learnSteps.length?key('carry',s.p+1):key('result',s.p);
+ }
+ return shown;
+}
+function drawLearningPractice(){
+ learningColumn('learn-practice',learnPractice,null,true);
+}
+function drawLearning(){
+ learningColumn('learn-demo',learnDemo,learningState(),false);
+ drawLearningPractice();
+ const s=learnSteps[Math.min(learnIndex,learnSteps.length-1)],done=learnIndex===learnSteps.length;
+ const box=$('learn-question');box.replaceChildren();
+ const title=document.createElement('div');title.textContent=done?'Brawo! Demonstracja zakończona.':('Kolumna '+['jedności','dziesiątek','setek','tysięcy','dziesiątek tysięcy','setek tysięcy','milionów','dziesiątek milionów'][s.p]);box.append(title);
+ const equation=document.createElement('div');equation.className='learn-equation';
+ const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
+ for(let i=0;i<terms.length;i++){if(i){const plus=document.createElement('span');plus.textContent='+';equation.append(plus)}const n=document.createElement('span');n.textContent=terms[i];equation.append(n)}
+ const equals=document.createElement('span');equals.textContent='=';equation.append(equals);
+ const result=document.createElement('span');result.textContent=done||learnIndex>0&&false?'':String(s.sum);equation.append(result);
+ if(!done){box.append(equation);const tip=document.createElement('div');tip.textContent='Ile to jest? Pomyśl, a potem wybierz „Pokaż krok”.';box.append(tip)}
+ else {const tip=document.createElement('div');tip.textContent='Teraz rozwiąż podobne działanie po prawej stronie.';box.append(tip)}
+ if(learnIndex>0&&!done){
+  const previous=learnSteps[learnIndex-1],tip=document.createElement('div');
+  tip.textContent='Poprzedni krok: zapisaliśmy '+previous.result+(previous.next?', przenieśliśmy '+previous.next+' dalej.':'.');
+  box.append(tip);
+ }
+ $('learn-prev').disabled=learnIndex===0;
+ $('learn-next').disabled=done;
+ $('learn-next').textContent=done?'Gotowe':'Pokaż krok';
+}
+function startLearning(){
+ level=Number($('level').value);mode='learn';
+ [learnDemo,learnPractice]=learningPair();learnSteps=learningSteps(learnDemo);
+ learnIndex=0;learnValues={};learnFinished=false;
+ const w=String(learnPractice[0]+learnPractice[1]).length;
+ learnActive=key('result',0);
+ for(let p=0;p<w;p++){learnValues[key('result',p)]='';if(p>0)learnValues[key('carry',p)]=''}
+ $('learn-feedback').textContent='';
+ $('learn-level').textContent='Tryb nauki · '+$('level').selectedOptions[0].textContent;
+ show('learn-screen');drawLearning();
+}
+function learnEnter(n){if(screen!=='learn-screen'||!learnActive)return;learnValues[learnActive]=String(n);drawLearningPractice()}
+function learnDelete(){if(screen!=='learn-screen'||!learnActive)return;learnValues[learnActive]='';drawLearningPractice()}
+function checkLearning(){
+ const ns=learnPractice,w=String(ns[0]+ns[1]).length,sum=ns[0]+ns[1];let carry=0,errors=0;
+ for(let p=0;p<w;p++){
+  const v=String(digit(sum,p));if(learnValues[key('result',p)]!==v)errors++;
+  const next=Math.floor((digit(ns[0],p)+digit(ns[1],p)+carry)/10);
+  if(p+1<w&&learnValues[key('carry',p+1)]!==(next?String(next):''))errors++;
+  carry=next;
+ }
+ $('learn-feedback').textContent=errors?'Sprawdź jeszcze raz. Błędnych lub pustych kratek: '+errors+'.':'Brawo! Całe działanie jest poprawne.';
+ for(const d of $('learn-practice').querySelectorAll('[data-learn]')){
+  const [kind,posText]=d.dataset.learn.split(':'),p=Number(posText);
+  const expected=kind==='result'?String(digit(sum,p)):(()=>{
+   let c=0;for(let i=0;i<p;i++)c=Math.floor((digit(ns[0],i)+digit(ns[1],i)+c)/10);
+   return c?String(c):'';
+  })();
+  d.classList.toggle('right',learnValues[d.dataset.learn]===expected);
+  d.classList.toggle('wrong',learnValues[d.dataset.learn]!==expected);
+ }
+}
+$('learn-next').onclick=()=>{if(learnIndex<learnSteps.length){learnIndex++;drawLearning()}};
+$('learn-prev').onclick=()=>{learnIndex=Math.max(0,learnIndex-1);drawLearning()};
+$('learn-reset').onclick=()=>{learnIndex=0;drawLearning()};
+$('learn-pause').onclick=()=>{$('pause-dialog').hidden=false};
+$('learn-delete').onclick=learnDelete;$('learn-check').onclick=checkLearning;$('learn-new').onclick=startLearning;
+for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>learnEnter(n);$('learn-keys').append(b)}
+
 applyOptions();show('home');
 </script></body></html>
