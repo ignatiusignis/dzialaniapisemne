@@ -1,16 +1,48 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Działania pisemne – Pan Ignacy</title>
 <style>
-:root{font-family:Arial,sans-serif;color:#182234;background:white}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:18px 12px}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}label{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:14px}button,select{font:inherit;border:1px solid #c7d0df;border-radius:9px;padding:11px 15px;background:#f5f7fb;color:#17243a;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #93c5fd}.primary{background:#2563eb;color:white;border-color:#2563eb}.workspace{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start;margin-top:36px}.panel{min-width:0;max-width:100%}.math{--cell:clamp(29px,7vw,48px);overflow-x:auto;max-width:100%;padding:10px 4px 14px}.column{width:max-content;margin:auto;background:#fff}.line{display:flex;align-items:center;height:var(--cell)}.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;justify-content:center;align-items:center;font-size:clamp(20px,5vw,30px);font-weight:600;font-variant-numeric:tabular-nums;border:1px solid #d9dfe8;margin-right:-1px;margin-bottom:-1px}.sign{width:var(--cell);font-size:28px}.entry{background:#eff6ff;color:#182234;cursor:pointer;padding:0;border:1px solid #cbdff8}.entry.active{background:#bfdbfe;border:2px solid #2563eb;position:relative;z-index:1}.entry.wrong{background:#fee2e2;border-color:#ef4444}.entry.right{background:#dcfce7;border-color:#22c55e}.carry .entry{font-size:20px}.carry{height:var(--cell)}.rule{border-top:3px solid #182234;margin:0 0 0 var(--cell);height:0;position:relative;z-index:2}.keypad{display:grid;grid-template-columns:repeat(5,minmax(45px,70px));gap:9px;margin:16px 0}.keypad button{font-size:23px;font-weight:bold;min-height:58px}.status{min-height:26px;font-weight:600}.solution{display:none}.solution.visible{display:block}.solution-title{font-size:16px;font-weight:600;margin:8px 0}.score{color:#526074;font-size:14px}.progress-head{display:flex;justify-content:space-between;max-width:390px;font-size:14px;margin:12px 0 5px}.progress{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));max-width:390px;border:1px solid #b9c3d2;border-radius:5px;overflow:hidden}.progress span{height:35px;display:grid;place-items:center;background:#f1f5f9;border-right:1px solid #b9c3d2;font-weight:bold;font-size:22px}.progress span:last-child{border:0}.progress .ok{background:#16a34a;color:white}.progress .bad{background:#dc2626;color:white} @media(max-width:460px){main{padding:12px 8px}.workspace{gap:16px}.keypad{grid-template-columns:repeat(5,1fr)}.keypad button{padding:10px 0}}
+:root{font-family:Arial,sans-serif;color:#182234;background:white}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:18px 12px}.toolbar,.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}label{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:14px}button,select{font:inherit;border:1px solid #c7d0df;border-radius:9px;padding:11px 15px;background:#f5f7fb;color:#17243a;cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #93c5fd}.primary{background:#2563eb;color:white;border-color:#2563eb}.workspace{display:flex;flex-wrap:wrap;gap:34px;align-items:flex-start;margin-top:36px}.panel{min-width:0;max-width:100%}.math{--cell:clamp(29px,7vw,48px);overflow-x:auto;max-width:100%;padding:10px 4px 14px}.column{width:max-content;margin:auto;background:#fff}.line{display:flex;align-items:center;height:var(--cell)}.cell{width:var(--cell);height:var(--cell);flex:none;display:flex;justify-content:center;align-items:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-variant-numeric:tabular-nums;border:1px solid #d9dfe8;margin-right:-1px;margin-bottom:-1px}.sign{width:var(--cell);font-size:28px}.entry{background:#eff6ff;color:#182234;cursor:pointer;padding:0;border:1px solid #cbdff8}.entry.active{background:#bfdbfe;border:2px solid #2563eb;position:relative;z-index:1}.entry.wrong{background:#fee2e2;border-color:#ef4444}.entry.right{background:#dcfce7;border-color:#22c55e}.carry .entry{font-size:20px}.carry{height:var(--cell)}.rule{border-top:3px solid #182234;margin:0 0 0 var(--cell);height:0;position:relative;z-index:2}.keypad{display:grid;grid-template-columns:repeat(5,minmax(45px,70px));gap:9px;margin:16px 0}.keypad button{font-size:23px;font-weight:bold;min-height:58px}.status{min-height:26px;font-weight:600}.solution{display:none}.solution.visible{display:block}.solution-title{font-size:16px;font-weight:600;margin:8px 0}.score{color:#526074;font-size:14px}.progress-head{display:flex;justify-content:space-between;max-width:390px;font-size:14px;margin:12px 0 5px}.progress{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));max-width:390px;border:1px solid #b9c3d2;border-radius:5px;overflow:hidden}.progress span{height:35px;display:grid;place-items:center;background:#f1f5f9;border-right:1px solid #b9c3d2;font-weight:bold;font-size:22px}.progress span:last-child{border:0}.progress .ok{background:#16a34a;color:white}.progress .bad{background:#dc2626;color:white} @media(max-width:460px){main{padding:12px 8px}.workspace{gap:16px}.keypad{grid-template-columns:repeat(5,1fr)}.keypad button{padding:10px 0}}
+
+:root{--bg:#f0f4fa;--surface:#fff;--ink:#182234;--muted:#53647b;--border:#cbd5e1;--entry:#eff6ff;--active:#bfdbfe;--grid:#d9dfe8}
+body{background:var(--bg);color:var(--ink);min-height:100dvh;display:grid;place-items:center;padding:14px}
+main{width:min(100%,1040px);min-height:min(700px,calc(100dvh - 28px));background:var(--surface);border:2px solid var(--border);border-radius:22px;box-shadow:0 12px 40px #17255415;padding:clamp(14px,3vw,30px);position:relative}
+.screen[hidden], [hidden]{display:none!important}
+.screen{width:100%}.menu{min-height:570px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;text-align:center}.menu h1{font-size:clamp(28px,5vw,44px);margin:0 0 15px}.menu h2{font-size:clamp(23px,4vw,32px);margin:0 0 10px}.menu button{width:min(100%,320px);min-height:52px}.menu .version{position:absolute;bottom:20px;color:var(--muted);font-size:12px}.menu .back{margin-top:15px}.menu .option{display:flex;flex-direction:column;gap:7px;width:min(100%,320px);text-align:left}
+.game-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.game-head button{min-width:95px}
+.game-head .level-label{font-weight:600;font-size:14px;color:var(--muted)}
+.cell{border-color:var(--grid)}.entry{background:var(--entry)}.entry.active{background:var(--active)}
+.workspace{margin-top:44px}
+.dialog{position:absolute;inset:0;background:#17255455;display:grid;place-items:center;border-radius:20px;padding:16px;z-index:10}
+.dialog[hidden]{display:none}
+.dialog-inner{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:25px;width:min(100%,400px);display:flex;flex-direction:column;gap:12px;text-align:center;box-shadow:0 15px 50px #0002}
+.dialog-inner h2{margin:0 0 6px}.dialog-inner button{min-height:46px}
+body.dark{--bg:#0b1220;--surface:#162238;--ink:#eef4ff;--muted:#b5c4d9;--border:#44546b;--entry:#263e5c;--active:#1d4ed8;--grid:#50627b}
+body.dark button,body.dark select{background:#243550;color:#eef4ff;border-color:#52627b}
+body.dark button.primary{background:#2563eb;border-color:#2563eb}
+body.dark .column{background:var(--surface)}
+body.dark .progress span{background:#25334a}body.dark .progress .ok{background:#15803d}body.dark .progress .bad{background:#b91c1c}
+body.dark .entry.wrong{background:#7f1d1d}body.dark .entry.right{background:#14532d}
+body.dark .entry.active{background:#1d4ed8}
+body.dark .cell{color:var(--ink)}
+body.dark .entry{color:var(--ink)}
+body.dark .score{color:var(--muted)}
+body.dark .rule{border-color:var(--ink)}
+@media(max-width:460px){body{padding:5px}main{border-radius:12px;padding:12px;min-height:calc(100dvh - 10px)}.menu{min-height:calc(100dvh - 55px)}.workspace{margin-top:28px}.game-head{align-items:flex-start}}
 </style></head><body><main>
-<div class="toolbar"><label>Poziom <select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></label><button id="new">Nowe zadanie</button></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
-<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button></div><div id="status" class="status" aria-live="polite"></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.3.0</div></section>
+<section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
+<section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
+<section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
+<div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
+<div class="workspace"><section class="panel"><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button><button id="new">Nowe zadanie</button></div><div id="status" class="status" aria-live="polite"></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div></section>
+<div class="dialog" id="pause-dialog" hidden><div class="dialog-inner"><h2>Pauza</h2><button class="primary" id="resume">Wznów</button><button id="restart">Zacznij od nowa</button><button id="pause-options">Opcje</button><button id="go-home">Powrót do menu</button></div></div>
+<div class="dialog" id="end-dialog" hidden><div class="dialog-inner"><h2>Dobra robota! 🎉</h2><p id="end-text"></p><button class="primary" id="next-series">Kolejna seria</button><button id="end-home">Menu główne</button></div></div>
 </main><script>
 'use strict';
 const $=id=>document.getElementById(id);
 const ranges=[[2,3],[3,4],[4,5],[5,6],[6,7]];
 let numbers=[],width=0,slots=[],values={},active='',phase='editing',attempted=false;
-let level=3,series=1,results=[],taskIndex=0;
+let level=3,series=1,results=[],taskIndex=0,screen='home',optionsFrom='home';
 const digit=(n,pos)=>Math.floor(n/10**pos)%10;
 const randomNumber=len=>Math.floor(10**(len-1)+Math.random()*9*10**(len-1));
 const key=(kind,pos)=>kind+':'+pos;
@@ -38,9 +70,9 @@ function acceptable(a,b){
  return d.count>=Math.min(4,w)&&d.maxChain>=3;
 }
 function generate(){
- const len=chooseLength();let best=null;
+ const len=chooseLength();const otherLen=(taskIndex%2===1&&len>1)?len-1:len;let best=null;
  for(let i=0;i<4000;i++){
-  const a=randomNumber(len),b=randomNumber(len),d=difficulty(a,b);
+  const a=randomNumber(len),b=randomNumber(otherLen),d=difficulty(a,b);
   if(acceptable(a,b))return [a,b];
   if(!best||d.count>best.d.count)best={a,b,d};
  }
@@ -104,8 +136,8 @@ function check(){
  if(phase!=='editing')return;
  const good=slots.filter(s=>values[key(s.kind,s.pos)]===s.expected).length;
  if(!attempted){
-  if(results.length===10){results=[];series++}
   results.push(good===slots.length);attempted=true;
+  if(results.length===10){$('end-text').textContent='Wynik serii: '+results.filter(Boolean).length+'/10. Możesz rozpocząć kolejną serię.';$('end-dialog').hidden=false;}
  }
  phase='review';draw('answer',true);$('solution').classList.add('visible');
  $('score').textContent='Poprawnych kratek: '+good+' z '+slots.length+'.';
@@ -117,13 +149,36 @@ function correct(){
  phase='editing';$('solution').classList.remove('visible');$('status').textContent='Popraw działanie i sprawdź ponownie.';render();
 }
 function next(){
+ if(results.length===10){finishSeries();return}
  if(attempted)taskIndex++;
  else if(!confirm('Pominąć bieżące zadanie? Nie zostanie ocenione.'))return;
  setup();
 }
 for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.addEventListener('click',()=>enter(n));$('keys').append(b)}
 $('delete').addEventListener('click',remove);$('check').addEventListener('click',check);$('correct').addEventListener('click',correct);$('new').addEventListener('click',next);
-$('level').addEventListener('change',()=>{level=Number($('level').value);taskIndex=0;setup()});
+
+function show(id){for(const el of document.querySelectorAll('.screen'))el.hidden=el.id!==id;screen=id}
+function finishSeries(){results=[];series++;taskIndex=0;$('end-dialog').hidden=true;setup()}
+function startGame(){level=Number($('level').value);series=1;results=[];taskIndex=0;$('game-level').textContent=$('level').selectedOptions[0].textContent;setup();show('game')}
+function openOptions(from){optionsFrom=from;if(from==='game')$('pause-dialog').hidden=true;show('options')}
+function applyOptions(){
+ const sizes={small:'clamp(18px,4.2vw,25px)',normal:'clamp(20px,5vw,30px)',large:'clamp(24px,6vw,38px)'};
+ document.documentElement.style.setProperty('--digit-font',sizes[$('font-size').value]);
+ document.body.classList.toggle('dark',$('theme').value==='dark');
+ try{localStorage.setItem('written-addition-options',JSON.stringify({size:$('font-size').value,theme:$('theme').value}))}catch(e){}
+}
+try{const saved=JSON.parse(localStorage.getItem('written-addition-options')||'{}');if(['small','normal','large'].includes(saved.size))$('font-size').value=saved.size;if(['light','dark'].includes(saved.theme))$('theme').value=saved.theme}catch(e){}
+$('home-new').onclick=()=>show('choose');$('home-options').onclick=()=>openOptions('home');
+$('choose-back').onclick=()=>show('home');$('start').onclick=startGame;
+$('pause').onclick=()=>{$('pause-dialog').hidden=false};
+$('resume').onclick=()=>{$('pause-dialog').hidden=true};
+$('restart').onclick=()=>{if(confirm('Rozpocząć grę od początku?')){series=1;results=[];taskIndex=0;setup();$('pause-dialog').hidden=true}};
+$('go-home').onclick=()=>{$('pause-dialog').hidden=true;show('home')};
+$('pause-options').onclick=()=>openOptions('game');
+$('options-back').onclick=()=>{show(optionsFrom);if(optionsFrom==='game')$('pause-dialog').hidden=false};
+$('font-size').onchange=applyOptions;$('theme').onchange=applyOptions;
+$('next-series').onclick=finishSeries;$('end-home').onclick=()=>{$('end-dialog').hidden=true;show('home')};
+applyOptions();
 document.addEventListener('keydown',e=>{if(['SELECT','BUTTON'].includes(e.target.tagName))return;if(/^[0-9]$/.test(e.key))enter(e.key);else if(e.key==='Backspace'||e.key==='Delete')remove()});
-setup();
+show('home');
 </script></body></html>
