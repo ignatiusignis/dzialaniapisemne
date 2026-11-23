@@ -46,8 +46,8 @@ body.dark .rule{border-color:var(--ink)}
 @keyframes learn-move{from{transform:translate(18px,-30px) scale(1.35);opacity:.15}to{transform:translate(0,0) scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.learn-flash{animation:none}}
 @media(max-width:690px){.learn-layout{grid-template-columns:1fr}.learn-pane .math{--cell:clamp(29px,7vw,45px)}}
-.learn-flying-digit{position:fixed;z-index:100;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--surface);border-radius:5px}.learn-carry-source{display:inline-grid;place-items:center;margin:8px 0;padding:3px 12px;background:var(--entry);border:1px solid var(--grid);border-radius:6px}.learn-equation{font-family:Arial,sans-serif} .learn-sum{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;gap:0!important;white-space:nowrap;min-width:0!important}.learn-sum span{min-width:0!important;min-height:0!important;display:inline-block!important;flex:none;line-height:1.2}.learn-digit-used{opacity:.32}.learn-equation span{transition:opacity .25s ease} .learn-column-highlight{background:var(--active)!important;box-shadow:inset 0 0 0 2px #3b82f6}.learn-prompt{font-weight:600;line-height:1.5;margin-bottom:10px}.learn-pane .entry{touch-action:manipulation} .learn-placement-source{display:inline-flex;align-items:center;justify-content:center;width:var(--cell,43px);height:43px;min-width:43px;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;border:1px solid var(--grid);background:var(--entry);margin-top:8px} </style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.6.0</div></section>
+.learn-flying-digit{position:fixed;z-index:100;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;font-family:Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--surface);border-radius:5px}.learn-carry-source{display:inline-grid;place-items:center;margin:8px 0;padding:3px 12px;background:var(--entry);border:1px solid var(--grid);border-radius:6px}.learn-equation{font-family:Arial,sans-serif} .learn-sum{display:inline-flex!important;flex-direction:row!important;align-items:center;justify-content:center;gap:0!important;white-space:nowrap;min-width:0!important}.learn-sum span{min-width:0!important;min-height:0!important;display:inline-block!important;flex:none;line-height:1.2}.learn-digit-used{opacity:.32}.learn-equation span{transition:opacity .25s ease} .learn-column-highlight{background:var(--active)!important;box-shadow:inset 0 0 0 2px #3b82f6}.learn-prompt{font-weight:600;line-height:1.5;margin-bottom:10px}.learn-pane .entry{touch-action:manipulation} .learn-placement-source{display:inline-flex;align-items:center;justify-content:center;width:var(--cell,43px);height:43px;min-width:43px;font-size:var(--digit-font,clamp(20px,5vw,30px));font-weight:600;border:1px solid var(--grid);background:var(--entry);margin-top:8px} .learn-full-expression{display:flex!important;flex-wrap:nowrap;white-space:nowrap;max-width:100%;overflow-x:auto;gap:clamp(3px,1vw,9px);padding:8px 0}.learn-full-expression>.learn-source-number{display:inline-flex!important;flex-direction:row;gap:0!important;min-width:0!important;flex:none}.learn-full-expression>.learn-source-number>span{display:inline-block!important;min-width:0!important;min-height:0!important;line-height:1.2;flex:none}.learn-full-expression>span{min-width:0!important;flex:none}.learn-pane{overflow-wrap:anywhere} </style></head><body><main>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><button class="primary" id="home-new">Nowa gra</button><button id="home-options">Opcje</button><div class="version">Wersja 0.6.1</div></section>
 <section class="screen menu" id="choose" hidden><h2>Nowa gra</h2><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button class="back" id="choose-back">Powrót</button></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="learn-screen" hidden>
@@ -499,7 +499,7 @@ async function advanceLearning(){
  if(learnLayout<learnLayoutSteps.length){
   learnBusy=true;$('learn-next').disabled=true;
   const item=learnLayoutSteps[learnLayout];
-  const source=$('learn-placement-source'),target=$('learn-demo').querySelector('[data-demo="'+item.k+'"]');
+  const source=$('learn-source-'+item.k.replace(':','-')),target=$('learn-demo').querySelector('[data-demo="'+item.k+'"]');
   await flyLearningDigit(source,target,item.value);
   learnLayout++;learnBusy=false;drawLearning();return;
  }
@@ -531,10 +531,23 @@ function drawLearning(){
  title.textContent=placing?'Najpierw układamy liczby w słupku':done?'Brawo! Demonstracja zakończona.':'Dodajemy podświetloną kolumnę';
  box.append(title);
  if(placing){
-  const item=learnLayoutSteps[learnLayout],tip=document.createElement('div');
-  tip.textContent='Działanie: '+learnDemo.join(' + ')+'. Wstawiamy cyfry od prawej strony, wyrównując jedności pod jednościami.';
+  const tip=document.createElement('div');
+  tip.textContent='Przenosimy cyfry do słupka, wyrównując jedności pod jednościami.';
   box.append(tip);
-  const source=document.createElement('span');source.id='learn-placement-source';source.className='learn-placement-source';source.textContent=item.value;box.append(source);
+  const expression=document.createElement('div');expression.className='learn-equation learn-full-expression';
+  learnDemo.forEach((n,row)=>{
+   if(row){const plus=document.createElement('span');plus.textContent='+';expression.append(plus)}
+   const number=document.createElement('span');number.className='learn-source-number';
+   const digits=String(n);
+   for(let i=0;i<digits.length;i++){
+    const p=digits.length-1-i,k=key('n'+row,p),d=document.createElement('span');
+    d.id='learn-source-'+k.replace(':','-');d.textContent=digits[i];
+    if(learnLayoutSteps.slice(0,learnLayout).some(item=>item.k===k))d.classList.add('learn-digit-used');
+    number.append(d);
+   }
+   expression.append(number);
+  });
+  box.append(expression);
  }else if(!done){
   const s=learnSteps[learnIndex],equation=document.createElement('div');equation.className='learn-equation';
   const terms=[...(s.incoming?[s.incoming]:[]),s.a,s.b];
