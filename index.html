@@ -449,7 +449,15 @@ function learningColumn(rootId,ns,shown,interactive){
  }),'carry');
  ns.forEach((n,r)=>{
   const row=document.createElement('div');row.className='line';row.append(cell(r===1?'+':'','sign'));
-  for(let p=w-1;p>=0;p--)row.append(p>=String(n).length?cell(''):cell(String(digit(n,p))));
+  for(let p=w-1;p>=0;p--){
+   if(p>=String(n).length){row.append(cell(''));continue}
+   const k=key('n'+r,p);
+   if(interactive){row.append(put('n'+r,p,learnValues[k]??'',true));continue}
+   const visible=learnLayout>=learnLayoutSteps.length||learnLayoutSteps.slice(0,learnLayout).some(item=>item.k===k);
+   const d=put('n'+r,p,visible?String(digit(n,p)):'');
+   if(learnLayout<learnLayoutSteps.length&&learnLayoutSteps[learnLayout].k===k)d.classList.add('learn-column-highlight');
+   row.append(d);
+  }
   root.append(row);
  });
  const rule=document.createElement('div');rule.className='rule';root.append(rule);
