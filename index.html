@@ -74,7 +74,7 @@ body.dark .rule{border-color:var(--ink)}
 .sandbox-config select{min-width:90px;min-height:44px}
 @media(min-width:850px){#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:start}#game:has(#sandbox-config:not([hidden])) .sandbox-config{grid-column:2;grid-row:1;align-self:start;flex-direction:column;align-items:flex-start;margin-top:10px}#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.math{grid-column:1;grid-row:1}#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.keypad,#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.actions,#game:has(#sandbox-config:not([hidden])) .workspace>.panel:first-child>.status{grid-column:1/-1}}
 .sub-cross{text-decoration:line-through;text-decoration-color:#dc2626;text-decoration-thickness:3px}.sub-help .cell{font-size:calc(var(--cell)*.5)}.sub-select{cursor:pointer}.sub-select.active{outline:2px solid #2563eb;outline-offset:-2px}#sub-screen .math{--cell:clamp(36px,9vw,48px)}</style></head><body><main>
-<section class="screen menu" id="home"><h1>Działania pisemne</h1><div class="option"><label for="operation">Rodzaj działania</label><select id="operation"><option value="add">Dodawanie</option><option value="sub">Odejmowanie</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button id="home-options">Opcje</button><div class="version">Wersja 1.1.0-alpha.2.1</div></section>
+<section class="screen menu" id="home"><h1>Działania pisemne</h1><div class="option"><label for="operation">Rodzaj działania</label><select id="operation"><option value="add">Dodawanie</option><option value="sub">Odejmowanie</option></select></div><div class="option"><label for="mode">Tryb gry</label><select id="mode"><option value="addition">Dodawanie pisemne</option><option value="missing">Uzupełnij składnik</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="multi">Wiele składników</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option><option value="learn">Tryb nauki</option></select></div><div class="option"><label for="level">Poziom trudności</label><select id="level"><option value="1">1 — Łatwy</option><option value="2">2 — Podstawowy</option><option value="3" selected>3 — Średni</option><option value="4">4 — Trudny</option><option value="5">5 — Ekspert</option></select></div><button class="primary" id="start">Rozpocznij</button><button id="home-options">Opcje</button><div class="version">Wersja 1.1.0-alpha.3</div></section>
 <section class="screen menu" id="options" hidden><h2>Opcje</h2><div class="option"><label for="font-size">Wielkość cyfr</label><select id="font-size"><option value="small">Mała</option><option value="normal" selected>Normalna</option><option value="large">Duża</option></select></div><div class="option"><label for="theme">Kolory</label><select id="theme"><option value="light">Tryb jasny</option><option value="dark">Tryb ciemny</option></select></div><button id="options-back">Powrót</button></section>
 <section class="screen" id="learn-screen" hidden>
 <div class="game-head"><span class="level-label" id="learn-level">Tryb nauki</span><button id="learn-pause">☰ Pauza</button></div>
@@ -89,7 +89,7 @@ body.dark .rule{border-color:var(--ink)}
 <section class="screen" id="game" hidden><div class="game-head"><span class="level-label" id="game-level"></span><button id="pause">☰ Pauza</button></div>
 <div id="test-heading" hidden><strong id="test-step"></strong></div><div class="progress-head"><span id="series-label">Seria 1</span><strong id="counter">0/0</strong></div><div class="progress" id="progress"></div>
 <div class="workspace"><section class="panel"><div id="sandbox-config" class="sandbox-config" hidden><label for="sandbox-count">Liczba składników</label><select id="sandbox-count" aria-label="Liczba składników"><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></div><div class="math"><div class="column" id="exercise"></div></div><div class="keypad" id="keys"></div><div class="actions"><button id="delete">Usuń</button><button id="check" class="primary">Sprawdź</button><button id="correct" hidden>Popraw</button><button id="new">Nowe zadanie</button><button id="submit-test" hidden>Oddaj kartkówkę</button></div><div id="status" class="status" aria-live="polite"></div><div id="test-review" hidden></div></section><section class="panel solution" id="solution"><div class="solution-title">Poprawne rozwiązanie</div><div class="math"><div class="column" id="answer"></div></div><p id="score" class="score"></p></section></div></section>
-<section class="screen" id="sub-screen" hidden><div class="game-head"><strong id="sub-title">Odejmowanie pisemne</strong><button id="sub-pause">☰ Pauza</button></div><p id="sub-progress"></p><div class="workspace"><section class="panel"><div class="math"><div class="column" id="sub-grid"></div></div><div class="keypad" id="sub-keys"></div><div class="actions"><button id="sub-delete">Usuń</button><button id="sub-cross">Skreśl</button><button class="primary" id="sub-check">Sprawdź</button><button id="sub-next">Nowe zadanie</button></div><div class="status" id="sub-status" aria-live="polite"></div></section></div></section><div class="dialog" id="pause-dialog" hidden><div class="dialog-inner"><h2>Pauza</h2><button class="primary" id="resume">Wznów</button><button id="restart">Zacznij od nowa</button><button id="pause-options">Opcje</button><button id="go-home">Powrót do menu</button></div></div>
+<section class="screen" id="sub-screen" hidden><div class="game-head"><strong id="sub-title">Odejmowanie pisemne</strong><button id="sub-pause">☰ Pauza</button></div><p id="sub-progress"></p><div class="workspace"><section class="panel"><div class="math"><div class="column" id="sub-grid"></div></div><div class="keypad" id="sub-keys"></div><div class="actions"><button id="sub-delete">Usuń</button><button id="sub-cross">Skreśl</button><button class="primary" id="sub-check">Sprawdź</button><button id="sub-next">Nowe zadanie</button></div><div class="status" id="sub-status" aria-live="polite"></div><div id="sub-review" hidden></div></section></div></section><div class="dialog" id="pause-dialog" hidden><div class="dialog-inner"><h2>Pauza</h2><button class="primary" id="resume">Wznów</button><button id="restart">Zacznij od nowa</button><button id="pause-options">Opcje</button><button id="go-home">Powrót do menu</button></div></div>
 <div class="dialog" id="end-dialog" hidden><div class="dialog-inner"><h2>Dobra robota! 🎉</h2><p id="end-text"></p><button class="primary" id="next-series">Kolejna seria</button><button id="end-home">Menu główne</button></div></div>
 </main><script>
 'use strict';
@@ -702,7 +702,7 @@ for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b
 
 
 const addMenu=$('mode').innerHTML;
-$('operation').onchange=()=>{$('mode').innerHTML=$('operation').value==='add'?addMenu:'<option value="subtraction">Odejmowanie pisemne</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option>'; $('mode').onchange()};
+$('operation').onchange=()=>{$('mode').innerHTML=$('operation').value==='add'?addMenu:'<option value="subtraction">Odejmowanie pisemne</option><option value="gaps">Puste luki</option><option value="repair">Popraw działanie</option><option value="test">Kartkówka — 5 zadań</option><option value="sandbox">Piaskownica</option>'; $('mode').onchange()};
 const sd=(n,p)=>Math.floor(n/10**p)%10;
 function subPlan(a,b){
  const w=String(a).length,d=Array.from({length:w},(_,p)=>sd(a,p)),hist=d.map(()=>[]),out=[];
@@ -716,13 +716,12 @@ function subGenerate(l){
  return [[43,21],[43,7],[543,278],[1000,7],[1000000,7]][l-1];
 }
 function subValidHistory(actual,want){const a=actual.map(String),w=want.map(String);return JSON.stringify(a)===JSON.stringify(w)||(w.length===2&&w[0]==='10'&&w[1]==='9'&&a.length===1&&a[0]==='9')}
-let subMode,subRows,subEditable,subA,subB,subW,subHist,subResult,subActive,subIndex,subScore,subLocked,subLevel;
-function subDraw(errors=null){
- const root=$('sub-grid');root.replaceChildren();
+let subTestItems=[],subMode,subRows,subEditable,subA,subB,subW,subHist,subResult,subActive,subIndex,subScore,subLocked,subLevel;
+function subDraw(errors=null,root=$('sub-grid'),interactive=true){root.replaceChildren();
  function row(j){const el=document.createElement('div');el.className='line'+(j>=3?' sub-help':'');el.append(cell(j===1?'−':'','sign'));
  for(let p=subW-1;p>=0;p--){const k=j+':'+p,v=j>=3?(subHist[p][j-3]??''):j===2?subResult[p]:subRows[j][p],edit=subEditable.has(k)||(j>=3&&subHist[p].length>j-3),select=edit||j===0,d=cell(v,edit?'entry':'');
  if((j===0&&subHist[p].length)||(j>=3&&subHist[p].length>j-2))d.classList.add('sub-cross');
- if(select){d.classList.add('sub-select');d.onclick=()=>{if(!subLocked){subActive=k;subDraw()}};if(!errors&&subActive===k)d.classList.add('active')}
+ if(select&&interactive){d.classList.add('sub-select');d.onclick=()=>{if(!subLocked){subActive=k;subDraw()}};if(!errors&&subActive===k)d.classList.add('active')}
  if(errors&&errors.has(k))d.classList.add('wrong','entry');else if(errors&&v!==''&&select)d.classList.add('right','entry');el.append(d)}root.append(el)}
  row(4);row(3);row(0);row(1);const rule=document.createElement('div');rule.className='rule';root.append(rule);row(2);
 }
@@ -733,14 +732,53 @@ function subPuzzle(a,b,m){
  }else{for(let p=0;p<w;p++)editable.add('2:'+p);if(m==='repair'){const p=Math.floor(Math.random()*String(a-b).length);result[p]=String((Number(result[p])+1)%10);if(String(a-b).length>1&&p===String(a-b).length-1&&result[p]==='0')result[p]='1'}else result.fill('')}
  return {rows,result,editable};
 }
-function subNew(){[subA,subB]=subGenerate(subLevel);subW=String(subA).length;subHist=Array.from({length:subW},()=>[]);const puzzle=subPuzzle(subA,subB,subMode);subRows=puzzle.rows;subResult=puzzle.result;subEditable=puzzle.editable;subActive=[...subEditable][0];subLocked=false;$('sub-check').disabled=false;$('sub-status').textContent=subMode==='gaps'?'Uzupełnij puste kratki i zapisz pożyczanie.':subMode==='repair'?'Znajdź i popraw błędną cyfrę wyniku. Uzupełnij pożyczanie.':'Wybierz cyfrę odjemnej, aby ją skreślić.';$('sub-progress').textContent='Zadanie '+(subIndex+1)+' / 10 · Poprawne: '+subScore;$('sub-next').textContent='Nowe zadanie';subDraw()}
-function subStart(){subMode=$('mode').value;$('sub-title').textContent=$('mode').selectedOptions[0].textContent;subLevel=Number($('level').value);subIndex=0;subScore=0;show('sub-screen');subNew()}
+function subNew(){
+ const sandbox=subMode==='sandbox',test=subMode==='test';
+ [subA,subB]=sandbox?[0,0]:subGenerate(test?subIndex+1:subLevel);subW=sandbox?7:String(subA).length;
+ subHist=Array.from({length:subW},()=>[]);
+ const puzzle=subPuzzle(subA,subB,subMode);subRows=sandbox?[Array(subW).fill(''),Array(subW).fill('')]:puzzle.rows;subResult=sandbox?Array(subW).fill(''):puzzle.result;subEditable=sandbox?new Set(Array.from({length:3},(_,j)=>Array.from({length:subW},(_,p)=>j+':'+p)).flat()):puzzle.editable;
+ subActive=[...subEditable][0];subLocked=false;$('sub-check').disabled=false;$('sub-check').textContent=test?(subIndex===4?'Oddaj kartkówkę':'Zapisz i dalej'):'Sprawdź';
+ $('sub-next').hidden=test;$('sub-next').textContent=sandbox?'Wyczyść':'Nowe zadanie';$('sub-review').hidden=true;$('sub-review').replaceChildren();
+ $('sub-status').textContent=sandbox?'Wpisz własne działanie. Wynik nie może być ujemny.':test?'Rozwiąż działanie i zapisz odpowiedź.':subMode==='gaps'?'Uzupełnij puste kratki i zapisz pożyczanie.':subMode==='repair'?'Znajdź i popraw błędną cyfrę wyniku. Uzupełnij pożyczanie.':'Wybierz cyfrę odjemnej, aby ją skreślić.';
+ $('sub-progress').textContent=sandbox?'':test?'Zadanie '+(subIndex+1)+' / 5':'Zadanie '+(subIndex+1)+' / 10 · Poprawne: '+subScore;subDraw()
+}
+function subStart(){subMode=$('mode').value;$('sub-title').textContent=$('mode').selectedOptions[0].textContent;subLevel=Number($('level').value);subIndex=0;subScore=0;subTestItems=[];show('sub-screen');subNew()}
 function subInput(n){if(subLocked)return;const [j,p]=subActive.split(':').map(Number);if(subEditable.has(subActive)){(j===2?subResult:subRows[j])[p]=n===null?'':String(n);if(j===0)subHist[p]=[];if(n!==null&&subEditable.has(j+':'+(p+1)))subActive=j+':'+(p+1)}else if(j>=3&&subHist[p].length>j-3){const v=subHist[p][j-3];subHist[p][j-3]=n===null?v.slice(0,-1):v.length<2?v+String(n):String(n)}$('sub-status').textContent='';subDraw()}
 function subCross(){if(subLocked)return;const [j,p]=subActive.split(':').map(Number),h=subHist[p];if(j===0&&subRows[0][p]!==''){if(!h.length)h.push('');subActive='3:'+p}else if(j===3&&h.length===1&&h[0]!==''){h.push('');subActive='4:'+p}else if(j>=3&&h.length===j-2){h.pop();subActive=(j===3?0:3)+':'+p}subDraw()}
-function subCheck(){if(subLocked)return;const plan=subPlan(subA,subB),errors=new Set(),expected=String(subA-subB);for(let p=0;p<subW;p++){for(let j=0;j<2;j++){const n=j===0?subA:subB;if(subRows[j][p]!== (p<String(n).length?String(sd(n,p)):''))errors.add(j+':'+p)}if(subResult[p]!== (p<expected.length?expected[expected.length-1-p]:''))errors.add('2:'+p);if(!subValidHistory(subHist[p],plan.hist[p])){errors.add('0:'+p);for(let j=0;j<subHist[p].length;j++)errors.add((j+3)+':'+p)}}subDraw(errors);$('sub-status').textContent=errors.size?'Sprawdź czerwone kratki.':'Brawo! Poprawne działanie.';if(!errors.size){subScore++;subLocked=true;$('sub-check').disabled=true}}
+function subRead(row){let digits='',blank=false;for(const v of row){if(v==='')blank=true;else{if(blank)return null;digits=v+digits}}return !digits||/^0\d/.test(digits)?null:Number(digits)}
+function subValidate(a,b,rows,result,hist,w){
+ const errors=new Set(),plan=subPlan(a,b),expected=String(a-b);
+ for(let p=0;p<w;p++){for(let j=0;j<2;j++){const n=j===0?a:b;if(rows[j][p]!== (p<String(n).length?String(sd(n,p)):''))errors.add(j+':'+p)}if(result[p]!== (p<expected.length?expected[expected.length-1-p]:''))errors.add('2:'+p);if(!subValidHistory(hist[p],plan.hist[p]||[])){errors.add('0:'+p);for(let j=0;j<hist[p].length;j++)errors.add((j+3)+':'+p)}}return errors
+}
+function subCheck(){
+ if(subLocked)return;
+ if(subMode==='sandbox'){const a=subRead(subRows[0]),b=subRead(subRows[1]);if(a===null||b===null||a<b){$('sub-status').textContent='Wpisz dwie liczby bez pustych miejsc i zer wiodących. Odjemna musi być większa lub równa odjemnikowi.';return}subA=a;subB=b}
+ const errors=subValidate(subA,subB,subRows,subResult,subHist,subW);
+ if(subMode==='test'){
+  subTestItems.push({a:subA,b:subB,w:subW,rows:subRows.map(x=>x.slice()),result:subResult.slice(),hist:subHist.map(x=>x.slice()),errors});
+  if(!errors.size)subScore++;subIndex++;if(subIndex<5){subNew();return}subFinishTest();return
+ }
+ subDraw(errors);$('sub-status').textContent=errors.size?'Sprawdź czerwone kratki.':'Brawo! Poprawne działanie.';
+ if(!errors.size&&subMode!=='sandbox'){subScore++;subLocked=true;$('sub-check').disabled=true}
+}
+function subFinishTest(){
+ subLocked=true;$('sub-check').disabled=true;$('sub-next').hidden=false;$('sub-next').textContent='Kolejna kartkówka';$('sub-progress').textContent='Kartkówka zakończona';$('sub-status').textContent='Wynik: '+subScore+' / 5';
+ const review=$('sub-review');review.hidden=false;review.replaceChildren();
+ for(const [i,t] of subTestItems.entries()){
+  const box=document.createElement('div');box.className='test-review-item';const title=document.createElement('h3');title.textContent='Zadanie '+(i+1)+' — '+(t.errors.size?'Do poprawy':'Poprawne');box.append(title);
+  const cols=document.createElement('div');cols.className='test-columns';box.append(cols);
+  for(const correct of [false,true]){
+   const pane=document.createElement('div');pane.className='test-column';const label=document.createElement('h4');label.textContent=correct?'Poprawne rozwiązanie':'Twoje rozwiązanie';pane.append(label);const math=document.createElement('div');math.className='math';const root=document.createElement('div');root.className='column';math.append(root);pane.append(math);cols.append(pane);
+   subA=t.a;subB=t.b;subW=t.w;subRows=t.rows;subEditable=new Set(Array.from({length:t.w},(_,p)=>'2:'+p));
+   if(correct){const plan=subPlan(t.a,t.b);subHist=plan.hist.map(x=>x.map(String));subResult=Array.from({length:t.w},(_,p)=>p<String(t.a-t.b).length?String(sd(t.a-t.b,p)):'')}else{subHist=t.hist;subResult=t.result}
+   subDraw(correct?new Set():t.errors,root,false);
+  }review.append(box)
+ }
+ const t=subTestItems.at(-1);subA=t.a;subB=t.b;subW=t.w;subRows=t.rows;subHist=t.hist;subResult=t.result;subDraw(t.errors,$('sub-grid'),false)
+}
 $('start').onclick=()=>$('operation').value==='sub'?subStart():startGame();
 for(const n of [1,2,3,4,5,6,7,8,9,0]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>subInput(n);$('sub-keys').append(b)}
-$('sub-delete').onclick=()=>subInput(null);$('sub-cross').onclick=subCross;$('sub-check').onclick=subCheck;$('sub-next').onclick=()=>{if(subIndex===10){subStart();return}subIndex++;if(subIndex===10){subLocked=true;$('sub-check').disabled=true;$('sub-status').textContent='Koniec serii. Wynik: '+subScore+' / 10';$('sub-next').textContent='Kolejna seria'}else subNew()};
+$('sub-delete').onclick=()=>subInput(null);$('sub-cross').onclick=subCross;$('sub-check').onclick=subCheck;$('sub-next').onclick=()=>{if(subMode==='sandbox'){if(confirm('Wyczyścić działanie?'))subNew();return}if(subMode==='test'||subIndex===10){subStart();return}subIndex++;if(subIndex===10){subLocked=true;$('sub-check').disabled=true;$('sub-status').textContent='Koniec serii. Wynik: '+subScore+' / 10';$('sub-next').textContent='Kolejna seria'}else subNew()};
 $('sub-pause').onclick=()=>{$('pause-dialog').hidden=false};
 const oldSubRestart=$('restart').onclick,oldSubOptions=$('pause-options').onclick,oldSubBack=$('options-back').onclick;
 $('restart').onclick=()=>{if(screen!=='sub-screen')return oldSubRestart();if(confirm('Rozpocząć od nowa?')){subStart();$('pause-dialog').hidden=true}};
